@@ -75,6 +75,10 @@ namespace delib.calculate
         {
             return operands[0].Value / operands[1].Value;
         }
+        public static Constant Modulo(Calculator calc, params Token[] operands)
+        {
+            return operands[0].Value % operands[1].Value;
+        }
         public static Constant Addition(Calculator calc, params Token[] operands)
         {
             return operands[0].Value + operands[1].Value;

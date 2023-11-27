@@ -25,6 +25,7 @@ namespace delib.calculate
             {')' , TokenTypeValue.Close_Paren },
             {'*' , TokenTypeValue.Multiplication },
             {'/' , TokenTypeValue.Division },
+            {'%' , TokenTypeValue.Modulo },
             {'+' , TokenTypeValue.Addition },
             {'-' , TokenTypeValue.Subtraction},
             {'.' , TokenTypeValue.Decimal_Point },
@@ -64,6 +65,7 @@ namespace delib.calculate
 
             {TokenTypeValue.Multiplication, 3},
             {TokenTypeValue.Division, 3},
+            {TokenTypeValue.Modulo, 3},
 
             {TokenTypeValue.Addition, 2},
             {TokenTypeValue.Subtraction, 2},
@@ -97,6 +99,7 @@ namespace delib.calculate
                     TokenTypeValue.Exponent,
                     TokenTypeValue.Multiplication,
                     TokenTypeValue.Division,
+                    TokenTypeValue.Modulo,
                     TokenTypeValue.Addition,
                     TokenTypeValue.Subtraction,
                     TokenTypeValue.Assignment,
@@ -137,6 +140,7 @@ namespace delib.calculate
                     TokenTypeValue.Exponent,
                     TokenTypeValue.Multiplication,
                     TokenTypeValue.Division,
+                    TokenTypeValue.Modulo,
                     TokenTypeValue.Addition,
                     TokenTypeValue.Subtraction
                 }
@@ -159,6 +163,16 @@ namespace delib.calculate
             },
             {
                 TokenTypeValue.Division,
+                new List<Operands>()
+                {
+                    new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant),
+                    new Operands(TokenTypeValue.Constant, TokenTypeValue.Operation),
+                    new Operands(TokenTypeValue.Operation, TokenTypeValue.Constant),
+                    new Operands(TokenTypeValue.Operation, TokenTypeValue.Operation),
+                }
+            },
+            {
+                TokenTypeValue.Modulo,
                 new List<Operands>()
                 {
                     new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant),
@@ -239,6 +253,10 @@ namespace delib.calculate
             {
                 new Operation(TokenTypeValue.Division, new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant)),
                 new OperationFunction(Operations.Division)
+            },
+            {
+                new Operation(TokenTypeValue.Modulo, new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant)),
+                new OperationFunction(Operations.Modulo)
             },
             {
                 new Operation(TokenTypeValue.Addition, new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant)),
