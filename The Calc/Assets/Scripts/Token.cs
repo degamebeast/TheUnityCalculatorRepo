@@ -2,7 +2,7 @@ using System;
 
 namespace delib.calculate
 {
-    public enum TokenTypeValue { Null, Invalid, Any, Identifier, Constant, Variable, Expression, Function, Arguments, Decimal_Point, Open_Paren, Close_Paren, Seperator, End_Statement, Operation, Exponent, Multiplication, Division, Modulo, Addition, Subtraction, Assignment }
+    public enum TokenTypeValue { Null, Invalid, Any, Identifier, Constant, Variable, Expression, Function, Arguments, Decimal_Point, Open_Paren, Close_Paren, Seperator, End_Statement, Operation, Exponent, Multiplication, Division, Modulo, Addition, Subtraction, Assignment, Left_Shift, Right_Shift }
 
     //The key class for creating expression
     //represents a singular piece of an expression Ex. '6' '^' '+' '34' 'var'

@@ -89,5 +89,13 @@ namespace delib.calculate
         {
             return MathF.Pow(operands[0].Value, operands[1].Value);
         }
+        public static Constant LeftShift(Calculator calc, params Token[] operands)
+        {
+            return (int)operands[0].Value << (int)operands[1].Value;
+        }
+        public static Constant RightShift(Calculator calc, params Token[] operands)
+        {
+            return (int)operands[0].Value >> (int)operands[1].Value;
+        }
     }
 }

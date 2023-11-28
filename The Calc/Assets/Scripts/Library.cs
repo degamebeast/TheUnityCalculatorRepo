@@ -27,7 +27,9 @@ namespace delib.calculate
             {'+' , TokenTypeValue.Addition },
             {'-' , TokenTypeValue.Subtraction},
             {'.' , TokenTypeValue.Decimal_Point },
-            {'^' , TokenTypeValue.Exponent }
+            {'^' , TokenTypeValue.Exponent },
+            {'<' , TokenTypeValue.Left_Shift },
+            {'>' , TokenTypeValue.Right_Shift },
 
         };
 
@@ -58,6 +60,8 @@ namespace delib.calculate
 
 
 
+            {TokenTypeValue.Left_Shift, 4},
+            {TokenTypeValue.Right_Shift, 4},
             {TokenTypeValue.Exponent, 4},
 
 
@@ -101,6 +105,8 @@ namespace delib.calculate
                     TokenTypeValue.Addition,
                     TokenTypeValue.Subtraction,
                     TokenTypeValue.Assignment,
+                    TokenTypeValue.Left_Shift,
+                    TokenTypeValue.Right_Shift,
                 }
             },
             {
@@ -140,7 +146,9 @@ namespace delib.calculate
                     TokenTypeValue.Division,
                     TokenTypeValue.Modulo,
                     TokenTypeValue.Addition,
-                    TokenTypeValue.Subtraction
+                    TokenTypeValue.Subtraction,
+                    TokenTypeValue.Left_Shift,
+                    TokenTypeValue.Right_Shift,
                 }
             }
 
@@ -210,6 +218,26 @@ namespace delib.calculate
                 }
             },
             {
+                TokenTypeValue.Left_Shift,
+                new List<Operands>()
+                {
+                    new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant),
+                    new Operands(TokenTypeValue.Constant, TokenTypeValue.Operation),
+                    new Operands(TokenTypeValue.Operation, TokenTypeValue.Constant),
+                    new Operands(TokenTypeValue.Operation, TokenTypeValue.Operation),
+                }
+            },
+            {
+                TokenTypeValue.Right_Shift,
+                new List<Operands>()
+                {
+                    new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant),
+                    new Operands(TokenTypeValue.Constant, TokenTypeValue.Operation),
+                    new Operands(TokenTypeValue.Operation, TokenTypeValue.Constant),
+                    new Operands(TokenTypeValue.Operation, TokenTypeValue.Operation),
+                }
+            },
+            {
                 TokenTypeValue.Assignment,
                 new List<Operands>()
                 {
@@ -267,6 +295,14 @@ namespace delib.calculate
             {
                 new Operation(TokenTypeValue.Exponent, new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant)),
                 new OperationFunction(Operations.Exponent)
+            },
+            {
+                new Operation(TokenTypeValue.Left_Shift, new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant)),
+                new OperationFunction(Operations.LeftShift)
+            },
+            {
+                new Operation(TokenTypeValue.Right_Shift, new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant)),
+                new OperationFunction(Operations.RightShift)
             },
             {
                 new Operation(TokenTypeValue.Assignment, new Operands(TokenTypeValue.Variable, TokenTypeValue.Constant)),
