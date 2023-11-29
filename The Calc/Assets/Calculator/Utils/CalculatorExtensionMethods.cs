@@ -20,6 +20,11 @@ namespace delib.calculate
                     Constant val = fi.GetValue(obj) as Constant;
                     classContextCalc.AddVariableToMemory(fi.Name, val);
                 }
+                else if(fi.FieldType == typeof(float))
+                {
+                    float val = (float)fi.GetValue(obj);
+                    classContextCalc.AddVariableToMemory(fi.Name, val);
+                }
 
             }
 

@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour
     public GameObject VariableMemoryViewContent;
 
     private Constant test;
+    private Constant example;
+    private float example2;
+
 
 
     private Calculator calc;
@@ -34,6 +37,8 @@ public class GameManager : MonoBehaviour
         Instance = this;
 
         test = 9;
+        example = 12;
+        example2 = 14;
 
         calc = this.GetClassAsCalculator();
         //Expression ex = classs.field2.ContainingClassContextFieldExpression;

@@ -44,15 +44,16 @@ namespace delib.calculate
             toggleBool.boolValue = EditorGUI.Foldout(labelPosition, toggleBool.boolValue, label,true);
             if(GUI.Button(postLabelPosition, "Validate"))
             {
-                Calculator varCheckCalc = new Calculator();
-                foreach (FieldInfo fi in property.serializedObject.targetObject.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
+                Calculator varCheckCalc = property.serializedObject.targetObject.GetClassAsCalculator();
+                //Calculator varCheckCalc = new Calculator();
+ /*               foreach (FieldInfo fi in property.serializedObject.targetObject.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
                 {
                     if (fi.FieldType == typeof(Constant))
                     {
                         //Constant val = fi.GetValue(property.serializedObject.targetObject) as Constant;
                         varCheckCalc.AddVariableToMemory(fi.Name);
                     }
-                }
+                }*/
                 validCheckBool.boolValue = Expression.Validate(expressionString.stringValue, varCheckCalc);
             }
 
