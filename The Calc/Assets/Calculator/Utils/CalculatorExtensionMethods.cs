@@ -25,6 +25,16 @@ namespace delib.calculate
                     float val = (float)fi.GetValue(obj);
                     classContextCalc.AddVariableToMemory(fi.Name, val);
                 }
+                else if (fi.FieldType == typeof(Integer))
+                {
+                    Integer val = fi.GetValue(obj) as Integer;
+                    classContextCalc.AddVariableToMemory(fi.Name, val);
+                }
+                else if (fi.FieldType == typeof(int))
+                {
+                    int val = (int)fi.GetValue(obj);
+                    classContextCalc.AddVariableToMemory(fi.Name, val);
+                }
 
             }
 

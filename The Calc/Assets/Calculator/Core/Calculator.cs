@@ -1,6 +1,7 @@
 //Created by: Deontae Albertie
 
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace delib.calculate
 {
@@ -65,6 +66,8 @@ namespace delib.calculate
             {
                 case TokenTypeValue.Variable:
                     return variableMemory[convert.ObjectName].Value;
+                case TokenTypeValue.Integer:
+                    return (Integer)(convert.Value);
                 default:
                     return convert.Value;
             }
@@ -76,6 +79,16 @@ namespace delib.calculate
             return variableMemory.TryAdd(var.VarName, var);
         }
         public bool AddVariableToMemory(string varName, Constant val = null)
+        {
+            return AddVariableToMemory(new Variable(varName, val));
+        }
+        //special overloads for adding integer variables
+        //this way they can be type distiguished later
+        public bool AddVariableToMemory(string varName, int val)
+        {
+            return AddVariableToMemory(new Variable(varName, new Integer(val)));
+        }
+        public bool AddVariableToMemory(string varName, Integer val)
         {
             return AddVariableToMemory(new Variable(varName, val));
         }
@@ -136,7 +149,7 @@ namespace delib.calculate
             {
                 case TokenTypeValue.Null://if null then just continue looping
                     return index + 1;
-                case TokenTypeValue.Variable://if a variable resolve down to it's stored Constant
+                case TokenTypeValue.Variable://if a variable, resolve down to it's stored Constant
                     if (expr[index + 1].Type == TokenTypeValue.Assignment)
                         return index + 1;
                     expr[index] = new Token(variableMemory[expr[index].ObjectName].Value);
@@ -152,7 +165,10 @@ namespace delib.calculate
                     Token prev = expr[index - 1];
                     Token symbol = expr[index];
                     Token next = expr[index + 1];
-                    Function funct = Library.defaultOperations[new Operation(symbol.Type, new Operands(prev.Type, next.Type))];
+                    Operation currentOp = new Operation(symbol.Type, new Operands(prev.Type, next.Type));
+                    UnityEngine.Debug.Log(currentOp);
+
+                    Function funct = Library.defaultOperations[currentOp];
                     expr[index - 1] = new Token(funct.Call(this, prev, next));
                     expr.RemoveRange(index, 2);
                     return index - 1;
@@ -166,7 +182,8 @@ namespace delib.calculate
         //this will overwrite it's current value if the variable already exists
         public static Constant AssignmentOperator(Calculator calc, params Token[] args)
         {
-            Variable newVar = new Variable(args[0].ObjectName, args[1].Value);
+            bool intCheck = args[1].Value is Integer;
+            Variable newVar = intCheck? new Variable(args[0].ObjectName, args[1].Value as Integer) : new Variable(args[0].ObjectName, args[1].Value);
             if (!calc.variableMemory.TryAdd(newVar.VarName, newVar))
             {
                 calc.variableMemory[newVar.VarName] = newVar;
@@ -208,7 +225,7 @@ namespace delib.calculate
 
         public Constant()
         {
-
+            value = float.NaN;
         }
         public Constant(float initVal)
         {
@@ -231,6 +248,53 @@ namespace delib.calculate
         {
             return new Constant(floatValue);
         }
+    }
+
+    //Wrapper class for c# int that extends the logic from the Constant class
+    //Constant class 'value' member will always be equal to float.NaN when checking from an Integer class instance
+    public class Integer : Constant
+    {
+        private int intValue;
+
+        public Integer() : base()
+        {
+
+        }
+        public Integer(int initVal) : base(float.NaN)
+        {
+            intValue = initVal;
+        }
+
+        public override string ToString()
+        {
+            return intValue.ToString();
+        }
+
+        public static implicit operator float(Integer integer)
+        {
+            if (integer == null)
+                return float.NaN;
+            return integer.intValue;
+        }
+
+        public static implicit operator Integer(float floatValue)
+        {
+            return new Integer((int)floatValue);
+        }
+
+        //will always convert down to 0 if integer object is null
+        public static implicit operator int(Integer integer)
+        {
+            if (integer == null)
+                return 0;
+            return integer.intValue;
+        }
+
+        public static implicit operator Integer(int intValue)
+        {
+            return new Integer(intValue);
+        }
+
     }
 
 

@@ -68,27 +68,108 @@ namespace delib.calculate
     {
         public static Constant Multiplication(Calculator calc, params Token[] operands)
         {
-            return operands[0].Value * operands[1].Value;
+            Constant left = operands[0].Value;
+            Constant right = operands[1].Value;
+            #region handle integer math
+            Integer intLeft = operands[0].Value as Integer;
+            Integer intRight = operands[1].Value as Integer;
+
+            if (intLeft != null && intRight != null)
+                return (Integer)(operands[0].Value) * (Integer)(operands[1].Value);
+
+            if (intLeft != null)
+                left = (float)intLeft;
+            if (intRight != null)
+                right = (float)intRight;
+            #endregion
+
+
+            return left * right;
         }
+
         public static Constant Division(Calculator calc, params Token[] operands)
         {
-            return operands[0].Value / operands[1].Value;
+            Constant left = operands[0].Value;
+            Constant right = operands[1].Value;
+            #region handle integer math
+            Integer intLeft = operands[0].Value as Integer;
+            Integer intRight = operands[1].Value as Integer;
+
+            if (intLeft != null && intRight != null)
+                return (Integer)(operands[0].Value) / (Integer)(operands[1].Value);
+
+            if (intLeft != null)
+                left = (float)intLeft;
+            if (intRight != null)
+                right = (float)intRight;
+            #endregion
+
+
+            return left / right;
         }
-        public static Constant Modulo(Calculator calc, params Token[] operands)
+        public static Integer Modulo(Calculator calc, params Token[] operands)
         {
             return operands[0].Value % operands[1].Value;
         }
         public static Constant Addition(Calculator calc, params Token[] operands)
         {
-            return operands[0].Value + operands[1].Value;
+            Constant left = operands[0].Value;
+            Constant right = operands[1].Value;
+            #region handle integer math
+            Integer intLeft = operands[0].Value as Integer;
+            Integer intRight = operands[1].Value as Integer;
+
+            if (intLeft != null && intRight != null)
+                return (Integer)(operands[0].Value) + (Integer)(operands[1].Value);
+
+            if (intLeft != null)
+                left = (float)intLeft;
+            if (intRight != null)
+                right = (float)intRight;
+            #endregion
+
+
+            return left + right;
         }
         public static Constant Subtraction(Calculator calc, params Token[] operands)
         {
-            return operands[0].Value - operands[1].Value;
+            Constant left = operands[0].Value;
+            Constant right = operands[1].Value;
+            #region handle integer math
+            Integer intLeft = operands[0].Value as Integer;
+            Integer intRight = operands[1].Value as Integer;
+
+            if (intLeft != null && intRight != null)
+                return (Integer)(operands[0].Value) - (Integer)(operands[1].Value);
+
+            if (intLeft != null)
+                left = (float)intLeft;
+            if (intRight != null)
+                right = (float)intRight;
+            #endregion
+
+
+            return left - right;
         }
         public static Constant Exponent(Calculator calc, params Token[] operands)
         {
-            return MathF.Pow(operands[0].Value, operands[1].Value);
+            Constant left = operands[0].Value;
+            Constant right = operands[1].Value;
+            #region handle integer math
+            Integer intLeft = operands[0].Value as Integer;
+            Integer intRight = operands[1].Value as Integer;
+
+            if (intLeft != null && intRight != null)
+                return MathF.Pow((Integer)(operands[0].Value), (Integer)(operands[1].Value));
+
+            if (intLeft != null)
+                left = (float)intLeft;
+            if (intRight != null)
+                right = (float)intRight;
+            #endregion
+
+
+            return MathF.Pow(left, right);
         }
         public static Constant LeftShift(Calculator calc, params Token[] operands)
         {

@@ -1038,12 +1038,12 @@ MonoBehaviour:
     inspectorToggle: 1
     validCheck: 1
     containingClass: {fileID: 1058662490}
-    expression: (56+4)/15 +  test * test
+    expression: 12+3 + intexample * intexample2
   field2:
     inspectorToggle: 1
     validCheck: 1
     containingClass: {fileID: 1058662490}
-    expression: 
+    expression: 7/6.0
   VariableMemoryViewContent: {fileID: 1720167673}
 --- !u!1 &1256280177
 GameObject:

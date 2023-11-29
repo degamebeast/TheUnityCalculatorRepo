@@ -26,13 +26,17 @@ public class GameManager : MonoBehaviour
     private Constant test;
     private Constant example;
     private float example2;
+    private float cobo;
 
-
+    private Integer inttest;
+    private Integer intexample;
+    private int intexample2;
 
     private Calculator calc;
 
     private void Awake()
     {
+        cobo = 10;
         TestingClass classs = new TestingClass();
         Instance = this;
 
@@ -40,10 +44,14 @@ public class GameManager : MonoBehaviour
         example = 12;
         example2 = 14;
 
+        inttest = 8;
+        intexample = 11;
+        intexample2 = 13;
+
         calc = this.GetClassAsCalculator();
         //Expression ex = classs.field2.ContainingClassContextFieldExpression;
         //CalculateExpress(field.RawFieldExpression);
-        CalculateExpress(field.RawFieldExpression);
+        //CalculateExpress(field.RawFieldExpression);
         Debug.Log(field.Evaluate());
         Debug.Log(field2.Evaluate());
         //CalculateExpress(field.ContainingClassContextFieldExpression);

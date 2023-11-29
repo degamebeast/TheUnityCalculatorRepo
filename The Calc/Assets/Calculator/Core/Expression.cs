@@ -143,7 +143,7 @@ namespace delib.calculate
 
                 Token prev = expr[index - 1];
                 Token next = expr[index + 1];
-                if (prev.Type != TokenTypeValue.Constant)
+                if (prev.Type != TokenTypeValue.Integer)
                 {
                     expr[index] = new Token(new Constant(float.Parse($"0.{next.Value}")));
                     expr.RemoveAt(index + 1);
@@ -151,7 +151,7 @@ namespace delib.calculate
                 }
                 else
                 {
-                    expr[index - 1] = new Token(new Constant(float.Parse($"{prev.Value}.{next.Value}")));
+                    expr[index - 1] = new Token(new Constant(float.Parse($"{(Integer)prev.Value}.{(Integer)next.Value}")));
                     expr.RemoveRange(index, 2);
                 }
             }
