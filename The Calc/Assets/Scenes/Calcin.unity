@@ -1033,8 +1033,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   expressionInput: {fileID: 1557621351}
   outputText: {fileID: 1017346224}
-  VariableMemoryViewContent: {fileID: 1720167673}
   textPreFab: {fileID: 7717357080427439117, guid: 3d4bfcfc215d15c4cb64f6b83875bc6e, type: 3}
+  field:
+    inspectorToggle: 1
+    validCheck: 1
+    containingClass: {fileID: 1058662490}
+    expression: (56+4)/15 +  test * test
+  field2:
+    inspectorToggle: 1
+    validCheck: 1
+    containingClass: {fileID: 1058662490}
+    expression: 
+  VariableMemoryViewContent: {fileID: 1720167673}
 --- !u!1 &1256280177
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
-using System;
+//Created by: Deontae Albertie
 
+using System;
 
 namespace delib.calculate
 {

@@ -1,6 +1,7 @@
+//Created by: Deontae Albertie
+
 using System;
 using System.Collections.Generic;
-
 
 namespace delib.calculate
 {

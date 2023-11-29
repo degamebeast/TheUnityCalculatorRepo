@@ -1,3 +1,5 @@
+//Created by: Deontae Albertie
+
 using System.Collections.Generic;
 
 namespace delib.calculate
@@ -17,21 +19,22 @@ namespace delib.calculate
 
         }
 
-        public void Calculate(string expr)
+        public Constant Calculate(string expr)
         {
-            Calculate(new Expression(expr));
+            return Calculate(new Expression(expr));
         }
 
         //solves the given expression and then stores the answer inside of the "ans" calculator variable
-        public void Calculate(Expression expr)
+        public Constant Calculate(Expression expr)
         {
             Expression[] statements = expr.GetStatements();
 
             foreach (Expression statementExpr in statements)
             {
-                variableMemory["ans"].Set(ExpressResult(ResolveIdentifiers(statementExpr)));
+                variableMemory["ans"].Set(ExpressResult(ResolveIdentifiers(statementExpr,true)));
             }
 
+            return variableMemory["ans"].Value;
         }
 
         //resolves the given expression down to a single constant token
@@ -67,6 +70,15 @@ namespace delib.calculate
             }
         }
 
+        //returns true if the given variable was successfully added to memory and false otherwise
+        public bool AddVariableToMemory(Variable var)
+        {
+            return variableMemory.TryAdd(var.VarName, var);
+        }
+        public bool AddVariableToMemory(string varName, Constant val = null)
+        {
+            return AddVariableToMemory(new Variable(varName, val));
+        }
         //returns a list of all variables in this calculators memory
         public List<Variable> GetVariablesInMemory()
         {
@@ -83,7 +95,7 @@ namespace delib.calculate
 
         //resolves all identifiers in an expression down to the related values in this calculator
         //if an identifier is not recognized it gets added to the variable memory (the added variable will be unitialized)
-        public Expression ResolveIdentifiers(Expression expr)
+        public Expression ResolveIdentifiers(Expression expr, bool addVariableIfNotInMemory = false)
         {
             for(int i = 0; i < expr.Count; i++)
             {
@@ -98,11 +110,16 @@ namespace delib.calculate
                         continue;
                     }
 
-                    if (!variableMemory.TryGetValue(cur.ObjectName, out var))
+                    if (variableMemory.TryGetValue(cur.ObjectName, out var))
+                    {
+                        expr[i] = new Token(cur.ObjectName, TokenTypeValue.Variable);
+                    }
+                    else if(addVariableIfNotInMemory)
                     {
                         variableMemory.Add(cur.ObjectName, new Variable(cur.ObjectName));
+                        expr[i] = new Token(cur.ObjectName, TokenTypeValue.Variable);
                     }
-                    expr[i] = new Token(cur.ObjectName, TokenTypeValue.Variable);
+
 
                 }
             }

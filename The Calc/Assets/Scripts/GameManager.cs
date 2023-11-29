@@ -1,9 +1,15 @@
+//Created by: Deontae Albertie
+
 using delib.calculate;
 using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public class TestingClass
+    {
+        //public ExpressionField field2 = new ExpressionField();
+    }
     public static GameManager Instance { get; private set; }
 
 
@@ -11,25 +17,38 @@ public class GameManager : MonoBehaviour
 
     public TMP_Text outputText;
 
+    public TMP_Text textPreFab;
+
+    public ExpressionField field;
+    public ExpressionField field2;
     public GameObject VariableMemoryViewContent;
 
-    public TMP_Text textPreFab;
+    private Constant test;
+
 
     private Calculator calc;
 
     private void Awake()
     {
+        TestingClass classs = new TestingClass();
         Instance = this;
 
-        calc = new Calculator();
+        test = 9;
 
+        calc = this.GetClassAsCalculator();
+        //Expression ex = classs.field2.ContainingClassContextFieldExpression;
+        //CalculateExpress(field.RawFieldExpression);
+        CalculateExpress(field.RawFieldExpression);
+        Debug.Log(field.Evaluate());
+        Debug.Log(field2.Evaluate());
+        //CalculateExpress(field.ContainingClassContextFieldExpression);
+        //CalculateExpress(classs.field2.ContainingClassContextFieldExpression);
     }
 
-    public void EqualsButtonHandler()
-    {
-        Expression expr = new Expression(expressionInput.text, calc);
 
-        if(!expr.Validate())
+    public void CalculateExpress(Expression expr)
+    {
+        if (!expr.Validate(calc))
         {
             outputText.text = "Error";
             return;
@@ -42,6 +61,15 @@ public class GameManager : MonoBehaviour
 
         outputText.text = ans.ToString();
     }
+
+    public void EqualsButtonHandler()
+    {
+        Expression expr = new Expression(expressionInput.text, calc);
+
+        CalculateExpress(expr);
+    }
+
+
 
     public void VariablesButtonHandler()
     {

@@ -1,9 +1,12 @@
+//Created by: Deontae Albertie
+
 namespace delib.calculate
 {
 
 
     #region structs
 
+    //[System.Serializable]
     //stores the true value of a token and contains several useful methods for doing token comparisons
     public struct TokenType
     {

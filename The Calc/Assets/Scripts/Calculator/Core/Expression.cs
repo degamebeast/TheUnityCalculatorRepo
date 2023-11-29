@@ -1,7 +1,10 @@
+//Created by: Deontae Albertie
+
 using System.Collections.Generic;
 
 namespace delib.calculate
 {
+
     public class Expression : List<Token>
     {
 
@@ -30,7 +33,7 @@ namespace delib.calculate
         //clean - whether or not the tokens should be cleaned up and compacted upon construction
         public Expression(string initialExpr, Calculator calc, bool clean = true) : base(Tokenize(initialExpr))
         {
-            calc.ResolveIdentifiers(this);
+            calc.ResolveIdentifiers(this,true);
 
             if (clean)
                 CleanExpression();
@@ -39,7 +42,7 @@ namespace delib.calculate
         //clean - whether or not the tokens should be cleaned up and compacted upon construction
         public Expression(List<Token> initTokens, Calculator calc, bool clean = true) : base(initTokens)
         {
-            calc.ResolveIdentifiers(this);
+            calc.ResolveIdentifiers(this,true);
 
             if (clean)
                 CleanExpression();
@@ -282,14 +285,21 @@ namespace delib.calculate
             return new Expression(expr).Validate();
         }
 
+        public static bool Validate(string expr, Calculator calc)
+        {
+            return calc.ResolveIdentifiers(new Expression(expr)).Validate();
+        }
+
         //returns true if this is a valid programmatical-mathematical expression (Within the context of this project). False otherwise
-        public bool Validate()
+        public bool Validate(Calculator resCalc = null)
         {
             if (Find(token => token.Type == TokenTypeValue.Invalid) != null) return false;
 
             bool valid = true;
             foreach (Expression expr in GetStatements())
             {
+                if (resCalc != null)
+                    resCalc.ResolveIdentifiers(expr);
                 if (!new EvaluationTree(expr).Validate())
                 {
                     valid = false;
