@@ -97,28 +97,11 @@ namespace delib.calculate
             return $"{left.ToString()}, {right.ToString()}";
         }
 
-/*        public override bool Equals(object obj)
-        {
-            if (obj is not Operands)
-            {
-                return false;
-            }
-            Operands other = (Operands)obj;
-
-
-
-            bool leftEquals = (left.Equals(other.left));
-            bool rightEquals = (right.Equals(other.right));
-            bool equals = leftEquals && rightEquals;
-
-            return equals;
-        }
-
         public override int GetHashCode()
         {
-            int code = left.GetHashCode() * right.GetHashCode();
-            return code.GetHashCode();
-        }*/
+            int hashCode = left.GetHashCode() * right.GetHashCode();
+            return hashCode.GetHashCode();
+        }
     }
 
     //represents an operation that can be performed in a calculator

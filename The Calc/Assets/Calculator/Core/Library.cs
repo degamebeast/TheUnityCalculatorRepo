@@ -43,6 +43,7 @@ namespace delib.calculate
         public static Dictionary<TokenTypeValue, uint> TokenPriority = new Dictionary<TokenTypeValue, uint>()
         {
             {TokenTypeValue.Null, 0},
+            {TokenTypeValue.Ignore, 0},
             {TokenTypeValue.Operation, 0},
             {TokenTypeValue.Dot, 0},
             {TokenTypeValue.Seperator, 0},
@@ -90,6 +91,7 @@ namespace delib.calculate
                 {
                     TokenTypeValue.Null,
                     TokenTypeValue.Invalid,
+                    TokenTypeValue.Ignore,
                     TokenTypeValue.Any,
                     TokenTypeValue.Identifier,
                     TokenTypeValue.Constant,
@@ -123,6 +125,7 @@ namespace delib.calculate
                     TokenTypeValue.Constant,
                     TokenTypeValue.Integer,
                     TokenTypeValue.Variable,
+                    TokenTypeValue.Identifier,
                     TokenTypeValue.Argument,
                     TokenTypeValue.Expression,
                     TokenTypeValue.Parameters
@@ -143,6 +146,16 @@ namespace delib.calculate
                 {
                     TokenTypeValue.Expression,
                     TokenTypeValue.Parameters
+                }
+            },
+            {
+                TokenTypeValue.Identifier,
+                new List<TokenTypeValue>()
+                {
+                    TokenTypeValue.Identifier,
+                    TokenTypeValue.Variable,
+                    TokenTypeValue.Function,
+                    TokenTypeValue.Argument
                 }
             },
             {
@@ -298,6 +311,10 @@ namespace delib.calculate
                 new OperationFunction(Operations.Multiplication)
             },
             {
+                new Operation(TokenTypeValue.Multiplication, new Operands(TokenTypeValue.Integer, TokenTypeValue.Integer)),
+                new OperationFunction(Operations.Multiplication)
+            },
+            {
                 new Operation(TokenTypeValue.Multiplication, new Operands(TokenTypeValue.Integer, TokenTypeValue.Constant)),
                 new OperationFunction(Operations.Multiplication)
             },
@@ -307,6 +324,10 @@ namespace delib.calculate
             },
             {
                 new Operation(TokenTypeValue.Division, new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant)),
+                new OperationFunction(Operations.Division)
+            },
+            {
+                new Operation(TokenTypeValue.Division, new Operands(TokenTypeValue.Integer, TokenTypeValue.Integer)),
                 new OperationFunction(Operations.Division)
             },
             {
@@ -322,6 +343,10 @@ namespace delib.calculate
                 new OperationFunction(Operations.Modulo)
             },
             {
+                new Operation(TokenTypeValue.Modulo, new Operands(TokenTypeValue.Integer, TokenTypeValue.Integer)),
+                new OperationFunction(Operations.Modulo)
+            },
+            {
                 new Operation(TokenTypeValue.Modulo, new Operands(TokenTypeValue.Integer, TokenTypeValue.Constant)),
                 new OperationFunction(Operations.Modulo)
             },
@@ -331,6 +356,10 @@ namespace delib.calculate
             },
             {
                 new Operation(TokenTypeValue.Addition, new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant)),
+                new OperationFunction(Operations.Addition)
+            },
+            {
+                new Operation(TokenTypeValue.Addition, new Operands(TokenTypeValue.Integer, TokenTypeValue.Integer)),
                 new OperationFunction(Operations.Addition)
             },
             {
@@ -346,6 +375,10 @@ namespace delib.calculate
                 new OperationFunction(Operations.Subtraction)
             },
             {
+                new Operation(TokenTypeValue.Subtraction, new Operands(TokenTypeValue.Integer, TokenTypeValue.Integer)),
+                new OperationFunction(Operations.Subtraction)
+            },
+            {
                 new Operation(TokenTypeValue.Subtraction, new Operands(TokenTypeValue.Integer, TokenTypeValue.Constant)),
                 new OperationFunction(Operations.Subtraction)
             },
@@ -358,6 +391,10 @@ namespace delib.calculate
                 new OperationFunction(Operations.Exponent)
             },
             {
+                new Operation(TokenTypeValue.Exponent, new Operands(TokenTypeValue.Integer, TokenTypeValue.Integer)),
+                new OperationFunction(Operations.Exponent)
+            },
+            {
                 new Operation(TokenTypeValue.Exponent, new Operands(TokenTypeValue.Integer, TokenTypeValue.Constant)),
                 new OperationFunction(Operations.Exponent)
             },
@@ -366,11 +403,11 @@ namespace delib.calculate
                 new OperationFunction(Operations.Exponent)
             },
             {
-                new Operation(TokenTypeValue.Left_Shift, new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant)),
+                new Operation(TokenTypeValue.Left_Shift, new Operands(TokenTypeValue.Constant, TokenTypeValue.Integer)),
                 new OperationFunction(Operations.LeftShift)
             },
             {
-                new Operation(TokenTypeValue.Right_Shift, new Operands(TokenTypeValue.Constant, TokenTypeValue.Constant)),
+                new Operation(TokenTypeValue.Right_Shift, new Operands(TokenTypeValue.Integer, TokenTypeValue.Integer)),
                 new OperationFunction(Operations.RightShift)
             },
             {
@@ -379,6 +416,14 @@ namespace delib.calculate
             },
             {
                 new Operation(TokenTypeValue.Assignment, new Operands(TokenTypeValue.Identifier, TokenTypeValue.Constant)),
+                new Function("assignment", 2, Calculator.AssignmentOperator)
+            },
+            {
+                new Operation(TokenTypeValue.Assignment, new Operands(TokenTypeValue.Variable, TokenTypeValue.Integer)),
+                new Function("assignment", 2, Calculator.AssignmentOperator)
+            },
+            {
+                new Operation(TokenTypeValue.Assignment, new Operands(TokenTypeValue.Identifier, TokenTypeValue.Integer)),
                 new Function("assignment", 2, Calculator.AssignmentOperator)
             }
         };

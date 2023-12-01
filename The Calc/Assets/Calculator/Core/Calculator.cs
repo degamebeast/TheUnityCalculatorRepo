@@ -1,5 +1,6 @@
 //Created by: Deontae Albertie
 
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -8,6 +9,8 @@ namespace delib.calculate
     //class for producing calculations
     public class Calculator
     {
+        public const int argLimit = 8;
+
         public Dictionary<string, Function> functionMemory;//all the functions stored in this calculator instance
         public Dictionary<string, Variable> variableMemory;//all the variables stored in this calculator instance
         protected Dictionary<string, Argument> argumentMemory;//the arguments stored in this calculator instance (from the most recent call to calculate)
@@ -19,6 +22,7 @@ namespace delib.calculate
             variableMemory.Add("ans", new Variable("ans"));
             variableMemory.Add("NaN", new Variable("NaN", float.NaN));
             argumentMemory = new Dictionary<string, Argument>();
+
             SetArguments(initArgs);
 
         }
@@ -45,10 +49,21 @@ namespace delib.calculate
         public void SetArguments(params object[] args)
         {
             argumentMemory.Clear();
-            for (int i = 0; i < args.Length; i++)
+
+            if (args.Length > argLimit)
+                throw new ArgumentException($"to many args where passed into calculator SetArgument:\tThe limit is {argLimit}");
+
+            for (int i = 0; i < argLimit; i++)
             {
-                string argName = $"arg{i}";
-                argumentMemory.Add(argName, new Argument(argName, args[i]));
+                    string argName = $"arg{i}";
+                if(i < args.Length)
+                {
+                    argumentMemory.Add(argName, new Argument(argName, args[i]));
+                }
+                else
+                {
+                    argumentMemory.Add(argName, null);
+                }
             }
         }
 
@@ -260,6 +275,9 @@ namespace delib.calculate
             Function curFunct = null;
             if (calc.functionMemory.TryGetValue(args[0].ObjectName, out curFunct))
             {
+                if (args[1].Expression == null) return float.NaN;
+                
+
                 Expression parameters = args[1].Expression.GetResolveParameters();
 
                 for (int i = 0; i < parameters.Count; i++)
@@ -268,7 +286,7 @@ namespace delib.calculate
                     parameters[i] = new Token(calc.ExpressResult(parameters[i].Expression));
                 }
 
-                return curFunct.Call(calc, parameters.RemoveNulls().ToArray());
+                return curFunct.Call(calc, parameters.RemoveAllNulls().ToArray());
             }
 
             return null;

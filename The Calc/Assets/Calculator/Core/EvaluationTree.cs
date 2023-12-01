@@ -147,23 +147,24 @@ namespace delib.calculate
 
         public EvaluationTree(Expression expr, params System.Type[] argTypes)
         {
-            GenerateTree(expr, this);
-            if (root != null)
+            GenerateTree(expr, this, argTypes);
+/*            if (root != null)
             {
                 root.subTree = this;
-            }
-            argumentTypes = argTypes;
+            }*/
+
         }
 
         //generates a tree based on the passed in expression
         //if 'storeTree' is given a value then the generated tree will be stored into it
-        public static EvaluationTree GenerateTree(Expression expr, EvaluationTree storeTree = null)
+        public static EvaluationTree GenerateTree(Expression expr, EvaluationTree storeTree = null, params System.Type[] argTypes)
         {
             if (expr == null)
                 return null;
             if (storeTree == null)
                 storeTree = new EvaluationTree();
 
+            storeTree.argumentTypes = argTypes;
 
             for (int priority = 1; priority <= Library.ConstantPriority; priority++)
             {
@@ -171,13 +172,15 @@ namespace delib.calculate
                 {
                     if (expr[index].Priority == priority)
                     {
-                        storeTree.root = new TreeNode(expr[index], null, GenerateTree(expr.SubExpression(0, index)).root, GenerateTree(expr.SubExpression(index + 1, (expr.Count - 1) - index)).root);
+                        storeTree.root = new TreeNode(expr[index], null, GenerateTree(expr.SubExpression(0, index), null, argTypes).root, GenerateTree(expr.SubExpression(index + 1, (expr.Count - 1) - index), null, argTypes).root);
+                        if (storeTree.root != null)
+                        {
+                            storeTree.root.subTree = storeTree;
+                        }
                         return storeTree;
                     }
                 }
             }
-
-
 
             return storeTree;
         }
@@ -219,22 +222,25 @@ namespace delib.calculate
             if (node == null)
                 return false;
 
-            if (node.token.Type == TokenTypeValue.Invalid || node.token.Type == TokenTypeValue.Identifier)//if an expression has unresolved identfiers then a result cannot be generated and thus it is an invalid expression
+            if (node.token.Type == TokenTypeValue.Invalid)//SELF NOTE: the following statement is no longer necessarily true however the implication still has merit (if an expression has unresolved identfiers then a result cannot be generated and thus it is an invalid expression)
                 return false;
 
             if (node.token.Type == TokenTypeValue.Argument)
             {
                 string[] argPath = node.token.ObjectName.Split('.');
                 string remainingPath = "";
-                for(int pathIndex = 1; pathIndex < argPath.Length; pathIndex++)
+                for (int pathIndex = 1; pathIndex < argPath.Length; pathIndex++)
                 {
                     remainingPath += $".{argPath[pathIndex]}";
                 }
-                if(remainingPath != "")
+                if (remainingPath != "")
                 {
                     remainingPath = remainingPath.Remove(0, 1);
                 }
                 int argNum = int.Parse(argPath[0].Remove(0, 3));
+
+                if (argNum >= node.subTree.argumentTypes.Length) return false;
+
                 return node.subTree.argumentTypes[argNum].FieldPathIsValid(remainingPath);
             }
 

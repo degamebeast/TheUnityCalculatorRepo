@@ -1,11 +1,10 @@
 //Created by: Deontae Albertie
 
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using TMPro;
+using UnityEngine.TextCore.Text;
 
-namespace delib.calculate
+namespace delib.calculate.unity
 {
 
     public class CalculatorInspector
@@ -13,7 +12,7 @@ namespace delib.calculate
 
     }
 
-
+    //PropertyDrawer for drawing the ExpressionField GUI
     [CustomPropertyDrawer(typeof(ExpressionFieldBase),true)]
     public class ExpressionFieldBaseDrawer : PropertyDrawer
     {
@@ -21,46 +20,58 @@ namespace delib.calculate
         // Draw the property inside the given rect
         public override void OnGUI(Rect startPosition, SerializedProperty property, GUIContent label)
         {
+            #region property info
+            //general constants for GUI
+            float standardSpacing = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+
+            //Get access to the current properties Type information
             System.Type propertyType = property.serializedObject.targetObject.GetType().GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
             System.Type[] propertyTypeGenericTypes = propertyType.GetGenericArguments();
 
-            Rect curPosition = startPosition;
-
-            float standardSpacing = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
-
-
-            //get fields
+            //property's internal property variables
             SerializedProperty expressionString = property.FindPropertyRelative("expression");
             SerializedProperty toggleBool = property.FindPropertyRelative("inspectorToggle");
             SerializedProperty validCheckBool = property.FindPropertyRelative("validCheck");
             SerializedProperty containingClassObject = property.FindPropertyRelative("containingClass");
-            //SerializedProperty parameterTypesList = property.FindPropertyRelative("parameterTypes");
+            #endregion
 
-            containingClassObject.objectReferenceValue = property.serializedObject.targetObject;
+            //assigning the current property position tracker to it's default value
+            Rect curPosition = startPosition;
 
+
+            //storing referencs to the current GUI colors
             Color origColor = GUI.color;
             Color origBackgroundColor = GUI.backgroundColor;
             Color origContentColor = GUI.contentColor;
+
+            //checking the current valid status and assigning values accordingly
             Color validColor = validCheckBool.boolValue? Color.green : Color.red;
 
+            //assign the current value of containing class to the serialized target object
+            //SELF NOTE: it may be worth trying to find a more effient way to do this
+            containingClassObject.objectReferenceValue = property.serializedObject.targetObject;
 
-            if (toggleBool.boolValue)
-                curPosition.height = standardSpacing;
 
-            // Using BeginProperty / EndProperty on the parent property means that
-            // prefab override logic works on the entire property.
+            //set cur position height to standard line height since most controlls will be at this height
+            curPosition.height = standardSpacing;
+
+            
+            //SELF NOTE: Using BeginProperty / EndProperty on the parent property means that, prefab override logic works on the entire property.
             EditorGUI.BeginProperty(curPosition, label, property);
-
+            
+            #region first line
+            //creating an invisible label in order to get appropriate spacing without messing up UI visuals
+            //SELF NOTE: I hope unity has a better way to do this!!
             GUI.color = new Color(0, 0, 0, 0);
             Rect postLabelPosition = EditorGUI.PrefixLabel(curPosition, label);
 
-            // Draw actual label
+            // Draw actual label (in this case the label is represented with an editor foldout)
             GUI.color = origColor;
-
-
             Rect labelPosition = new Rect(curPosition.x, curPosition.y, curPosition.width-postLabelPosition.width, curPosition.height);
             toggleBool.boolValue = EditorGUI.Foldout(labelPosition, toggleBool.boolValue, label,true);
 
+
+            //draw validate button in the corresponding color
             GUI.backgroundColor = validColor;
             if(GUI.Button(postLabelPosition, "Validate"))
             {
@@ -68,88 +79,120 @@ namespace delib.calculate
                 validCheckBool.boolValue = Expression.Validate(expressionString.stringValue, varCheckCalc, propertyTypeGenericTypes);
             }
             GUI.backgroundColor = origColor;
+            #endregion
 
-            // Don't make child fields be indented
+
+
+            //SELF NOTE: Don't make child fields be indented
+            //storing current indentation level
             var indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
-            //GUIStyle style = new GUIStyle();
+
+
             GUILayout.BeginVertical();
             if (toggleBool.boolValue)
             {
-/*                float expandedSpacing = 0;
-                if (propertyType.IsGenericType)
-                {
-                    int arraySize = propertyTypeGenericTypes.Length;
-                    expandedSpacing = standardSpacing * arraySize;
-                }*/
-
-                for(int i = 0; i < propertyTypeGenericTypes.Length; i++)
+                Calculator propCalc = CalcHelper.ConvertClassToCalculator(propertyType);
+                //draw all generic TYpe info
+                for (int i = 0; i < propertyTypeGenericTypes.Length; i++)
                 {
                     curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, EditorGUIUtility.singleLineHeight);
                     EditorGUI.LabelField(curPosition, $"arg{i} |\tType: {propertyTypeGenericTypes[i].Name}");
                 }
 
 
-                curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, EditorGUIUtility.singleLineHeight);
-
-                //GUI.backgroundColor = validColor;
+                //create textArea style
                 GUIStyle textAreaStyle = new GUIStyle(GUI.skin.textArea);
                 textAreaStyle.richText = true;
-/*                int curKeyControl = GUIUtility.keyboardControl;
-                int curHotControl = GUIUtility.hotControl;
-                GUIUtility.keyboardControl = 0;
-                GUIUtility.hotControl = 0;
-                GUIUtility.keyboardControl = curKeyControl;
-                GUIUtility.hotControl = curHotControl*/;
+                textAreaStyle.font = Resources.Load<FontAsset>("ExpressionFieldTextAreaFont").sourceFontFile;
+
+                //create textArea for user input
+                curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, EditorGUIUtility.singleLineHeight);
                 string valHolder = EditorGUI.TextArea(curPosition, expressionString.stringValue,textAreaStyle);
+                
+                //create label directly over textArea to display text with coloring
                 GUI.backgroundColor = new Color(0, 0, 0, 0);
-                Expression labelExpress = new Expression(valHolder,false,true);
-                labelExpress.RemoveNulls();
+                Expression labelExpress = new Expression(valHolder,false);
+                propCalc.ResolveIdentifiers(labelExpress);
+                labelExpress.AddNullCaps();
+                Expression.CondenseDots(labelExpress);
+                labelExpress.RemoveAllNulls();
+
                 string labelText = "";
-
-
-                foreach(Token toke in labelExpress)
+                int textIndex = 0;
+                foreach (Token toke in labelExpress)
                 {
-                    Color col = CalculatorHelper.TokenColor[toke.Type];
+                    Color col = CalcUnityHelper.TokenInspectorColor[toke.Type];
+                    string tokeText = toke.ToString();
+                    //removes any differences between what has been typed and what is being presented to the user
+                    //NOTE: this for loop is wildly unsafe, will eventually need to improve
+                    for(int i = 0; i < tokeText.Length;)
+                    {
+                        if (valHolder[textIndex] != tokeText[i])
+                        {
+                            tokeText = tokeText.Remove(i, 1);
+                            continue;
+                        }
+                        i++;
+                        textIndex++;
+                    }
+
                     if (toke.Type == TokenTypeValue.Invalid)
+                        labelText += $"<color=\"#{ColorUtility.ToHtmlStringRGBA(col)}\">_</color>";
+                    else if (toke.Type == TokenTypeValue.Ignore)
                         labelText += " ";
                     else
-                        labelText += $"<color=\"#{ColorUtility.ToHtmlStringRGBA(col)}\">{toke}</color>";
+                        labelText += $"<color=\"#{ColorUtility.ToHtmlStringRGBA(col)}\">{tokeText}</color>";
+
+
                 }
 
                 EditorGUI.LabelField(curPosition, labelText, textAreaStyle);
 
-                //valHolder = CalculatorHelper.RemoveAllRichText(valHolder);
 
+                //assign current value stored in textArea back out to the expression field in property
                 expressionString.stringValue = valHolder;
             }
             GUILayout.EndVertical();
+
+
             // Set indent back to what it was
             EditorGUI.indentLevel = indent;
 
             EditorGUI.EndProperty();
 
+            //restore previous GUI colors before exiting function
             GUI.contentColor = origContentColor;
             GUI.backgroundColor = origBackgroundColor;
             GUI.color = origColor;
         }
 
+        //Inspector function for determining a controls height
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            System.Type propertyType = property.serializedObject.targetObject.GetType().GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
-            System.Type[] propertyTypeGenericTypes = propertyType.GetGenericArguments();
+            #region property info
+
+            //general constants for GUI
             float standardSpacing = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
 
+            //Get access to the current properties Type information
+            System.Type propertyType = property.serializedObject.targetObject.GetType().GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
+            System.Type[] propertyTypeGenericTypes = propertyType.GetGenericArguments();
+
+
+            //property's internal property variables
             SerializedProperty expressionString = property.FindPropertyRelative("expression");
             SerializedProperty toggleBool = property.FindPropertyRelative("inspectorToggle");
             SerializedProperty validCheckBool = property.FindPropertyRelative("validCheck");
             SerializedProperty containingClassObject = property.FindPropertyRelative("containingClass");
-            //SerializedProperty parameterTypesList = property.FindPropertyRelative("parameterTypes");
+            #endregion
 
             float standardHeight = base.GetPropertyHeight(property, label);
 
+            //if the drop down is on then addspace for the 'expression' property to be drawn
             if (toggleBool.boolValue)
             {
+                //if 'property' is a generic type then addspace for the generic values info to be drawn
                 if (propertyType.IsGenericType)
                 {
                     int arraySize = propertyTypeGenericTypes.Length;
@@ -159,6 +202,7 @@ namespace delib.calculate
 
                 return standardHeight + standardSpacing;
             }
+
             return standardHeight;
         }
     }

@@ -1038,9 +1038,9 @@ MonoBehaviour:
     inspectorToggle: 1
     validCheck: 1
     containingClass: {fileID: 1058662490}
-    expression: 45+2.4
+    expression: 
   field2:
-    inspectorToggle: 1
+    inspectorToggle: 0
     validCheck: 1
     containingClass: {fileID: 1058662490}
     expression: 

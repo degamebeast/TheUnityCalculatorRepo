@@ -16,7 +16,7 @@ namespace delib.calculate
         }
 
         //clean - whether or not the tokens should be cleaned up and compacted upon construction
-        public Expression(string initialExpr, bool clean = true, bool markDelimetersAsInvalid = false) : base(Tokenize(initialExpr, markDelimetersAsInvalid))
+        public Expression(string initialExpr, bool clean = true) : base(Tokenize(initialExpr))
         {
             if (clean)
                 CleanExpression();
@@ -31,9 +31,9 @@ namespace delib.calculate
 
         //calc - a calculator that all identifiers will be resolved to upon construction. This value IS NOT stored inside the expression afterwards
         //clean - whether or not the tokens should be cleaned up and compacted upon construction
-        public Expression(string initialExpr, Calculator calc, bool clean = true, bool markDelimetersAsInvalid = false) : base(Tokenize(initialExpr, markDelimetersAsInvalid))
+        public Expression(string initialExpr, Calculator calc, bool clean = true) : base(Tokenize(initialExpr))
         {
-            calc.ResolveIdentifiers(this,true);
+            calc.ResolveIdentifiers(this, true);
 
             if (clean)
                 CleanExpression();
@@ -42,7 +42,7 @@ namespace delib.calculate
         //clean - whether or not the tokens should be cleaned up and compacted upon construction
         public Expression(List<Token> initTokens, Calculator calc, bool clean = true) : base(initTokens)
         {
-            calc.ResolveIdentifiers(this,true);
+            calc.ResolveIdentifiers(this, true);
 
             if (clean)
                 CleanExpression();
@@ -58,7 +58,7 @@ namespace delib.calculate
         //splits up the expression into smaller expressions base on the 'End_Statement' token as the delimiter
         public Expression[] GetStatements()
         {
-            RemoveNulls();
+            RemoveAllNulls();
             List<Expression> statements = new List<Expression>();
 
             int curStatementTracker = 0;
@@ -86,9 +86,25 @@ namespace delib.calculate
 
 
         //USE WITH CAUTION: Nulls are designed to allow expression check safety. ONLY REMOVE IF YOU KNOW YOU DONT NEED THEM
-        public Expression RemoveNulls()
+        public Expression RemoveAllNulls()
         {
             RemoveAll(token => token.Type == TokenTypeValue.Null);
+
+            return this;
+        }
+
+        //USE WITH CAUTION: Nulls are designed to allow expression check safety. ONLY REMOVE IF YOU KNOW YOU DONT NEED THEM
+        public Expression RemoveAllIgnores()
+        {
+            RemoveAll(token => token.Type == TokenTypeValue.Ignore);
+
+            return this;
+        }
+
+        public Expression AddNullCaps()
+        {
+            Insert(0, Token.NullToken);
+            Add(Token.NullToken);
 
             return this;
         }
@@ -97,9 +113,9 @@ namespace delib.calculate
         //removes excess nulls from the expression and then cleans up the tokens
         public void CleanExpression()
         {
-            RemoveNulls();
-            Insert(0, Token.NullToken);
-            Add(Token.NullToken);
+            RemoveAllNulls();
+            RemoveAllIgnores();
+            AddNullCaps();
 
             CleanUpTokens(this);
         }
@@ -112,7 +128,12 @@ namespace delib.calculate
         //returns the resulting Expression object
         private Expression CleanUpTokens(Expression expr)
         {
-            //converts all tokens between parenthesis' into their own expressions
+            return CondenseSubtractionLines(CondenseDots(CondenseParenthesis(expr)));
+        }
+
+        //converts all tokens between parenthesis' into their own expressions
+        public static Expression CondenseParenthesis(Expression expr)
+        {
             for (int start = expr.Count - 1; start >= 0; start--)
             {
                 if (expr[start].Type == TokenTypeValue.Open_Paren)
@@ -135,7 +156,12 @@ namespace delib.calculate
                 }
             }
 
-            //Converts all decimal point tokens into floating point numbers and or Arguments
+            return expr;
+        }
+
+        //Converts all decimal point tokens into floating point numbers and or Arguments
+        public static Expression CondenseDots(Expression expr)
+        {
             for (int index = expr.Count - 1; index >= 0; index--)
             {
                 Token symbol = expr[index];
@@ -144,7 +170,7 @@ namespace delib.calculate
                 Token prev = expr[index - 1];
                 Token next = expr[index + 1];
 
-                if(next.Type == TokenTypeValue.Identifier)
+                if (next.Type == TokenTypeValue.Identifier)
                 {
                     if (prev.Type == TokenTypeValue.Identifier)
                     {
@@ -152,14 +178,14 @@ namespace delib.calculate
                         expr.RemoveRange(index, 2);
                     }
                 }
-                else if(next.Type == TokenTypeValue.Integer)
+                else if (next.Type == TokenTypeValue.Integer)
                 {
                     if (prev.Type == TokenTypeValue.Integer)
                     {
                         expr[index - 1] = new Token(new Constant(float.Parse($"{(Integer)prev.Value}.{(Integer)next.Value}")));
                         expr.RemoveRange(index, 2);
                     }
-                    else
+                    else if(!prev.Type.ResolvesTo(TokenTypeValue.Identifier))
                     {
                         expr[index] = new Token(new Constant(float.Parse($"0.{next.Value}")));
                         expr.RemoveAt(index + 1);
@@ -167,7 +193,13 @@ namespace delib.calculate
                 }
 
             }
-            //converts any 'subtraction' tokens that are representing negation into a negitive number
+
+            return expr;
+        }
+
+        //converts any 'subtraction' tokens that are representing negation into a negitive number
+        public static Expression CondenseSubtractionLines(Expression expr)
+        {
             for (int index = expr.Count - 1; index >= 0; index--)
             {
                 Token symbol = expr[index];
@@ -180,7 +212,6 @@ namespace delib.calculate
                 expr[index] = new Token(new Constant(-1));
                 expr.Insert(index + 1, new Token(TokenTypeValue.Multiplication));
             }
-
 
             return expr;
         }
@@ -196,7 +227,7 @@ namespace delib.calculate
         public static Expression ResolveParameters(Expression expr)
         {
             Expression copy = new Expression(expr);
-            copy.RemoveNulls();
+            copy.RemoveAllNulls();
             List<Token> parameters = new List<Token>();
 
             int curStatementTracker = 0;
@@ -218,7 +249,7 @@ namespace delib.calculate
         }
 
         //converts a string into a list of token's
-        public static List<Token> Tokenize(string expr, bool markDelimitersAsInvalid = false)
+        public static List<Token> Tokenize(string expr)
         {
             List<Token> tokens = new List<Token>();
             List<char> digitBuffer = new List<char>();
@@ -268,8 +299,7 @@ namespace delib.calculate
 
                 if (Library.Delimiters.Contains(character))
                 {
-                    if (markDelimitersAsInvalid)
-                        tokens.Add(Token.InvalidToken);
+                    tokens.Add(Token.IgnoreToken);
                     continue;
                 }
 
