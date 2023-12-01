@@ -86,41 +86,41 @@ namespace delib.calculate
         public static Dictionary<TokenTypeValue, UnityEngine.Color> TokenColor = new Dictionary<TokenTypeValue, UnityEngine.Color>()
         {
             {TokenTypeValue.Null, UnityEngine.Color.white},
-            {TokenTypeValue.Operation, UnityEngine.Color.white},
-            {TokenTypeValue.Dot, UnityEngine.Color.white},
-            {TokenTypeValue.Seperator, UnityEngine.Color.white},
-            {TokenTypeValue.End_Statement, UnityEngine.Color.white},
-            {TokenTypeValue.Open_Paren, UnityEngine.Color.white},
-            {TokenTypeValue.Close_Paren, UnityEngine.Color.white},
+            {TokenTypeValue.Operation, UnityEngine.Color.red},
+            {TokenTypeValue.Dot, UnityEngine.Color.red},
+            {TokenTypeValue.Seperator, UnityEngine.Color.red},
+            {TokenTypeValue.End_Statement, UnityEngine.Color.red},
+            {TokenTypeValue.Open_Paren, UnityEngine.Color.red},
+            {TokenTypeValue.Close_Paren, UnityEngine.Color.red},
 
 
             {TokenTypeValue.Parameters, UnityEngine.Color.white},
             {TokenTypeValue.Invalid, UnityEngine.Color.white},
-            {TokenTypeValue.Identifier, UnityEngine.Color.white},
-            {TokenTypeValue.Integer, UnityEngine.Color.white},
-            {TokenTypeValue.Constant, UnityEngine.Color.white},
+            {TokenTypeValue.Identifier, UnityEngine.Color.cyan},
+            {TokenTypeValue.Integer, UnityEngine.Color.green},
+            {TokenTypeValue.Constant, UnityEngine.Color.green},
 
-            {TokenTypeValue.Function, UnityEngine.Color.white},
+            {TokenTypeValue.Function, UnityEngine.Color.yellow},
 
             {TokenTypeValue.Expression, UnityEngine.Color.white},
-            {TokenTypeValue.Argument, UnityEngine.Color.white},
-            {TokenTypeValue.Variable, UnityEngine.Color.white},
+            {TokenTypeValue.Argument, UnityEngine.Color.magenta},
+            {TokenTypeValue.Variable, UnityEngine.Color.cyan},
 
 
 
-            {TokenTypeValue.Left_Shift, UnityEngine.Color.white},
-            {TokenTypeValue.Right_Shift, UnityEngine.Color.white},
-            {TokenTypeValue.Exponent, UnityEngine.Color.white},
+            {TokenTypeValue.Left_Shift, UnityEngine.Color.red},
+            {TokenTypeValue.Right_Shift, UnityEngine.Color.red},
+            {TokenTypeValue.Exponent, UnityEngine.Color.red},
 
 
-            {TokenTypeValue.Multiplication, UnityEngine.Color.white},
-            {TokenTypeValue.Division, UnityEngine.Color.white},
-            {TokenTypeValue.Modulo, UnityEngine.Color.white},
+            {TokenTypeValue.Multiplication, UnityEngine.Color.red},
+            {TokenTypeValue.Division, UnityEngine.Color.red},
+            {TokenTypeValue.Modulo, UnityEngine.Color.red},
 
             {TokenTypeValue.Addition, UnityEngine.Color.red},
-            {TokenTypeValue.Subtraction, UnityEngine.Color.white},
+            {TokenTypeValue.Subtraction, UnityEngine.Color.red},
 
-            {TokenTypeValue.Assignment, UnityEngine.Color.white},
+            {TokenTypeValue.Assignment, UnityEngine.Color.red},
 
         };
         //In this context a comment is any section of a string surrounded by '\' (backslahes)

@@ -1038,7 +1038,7 @@ MonoBehaviour:
     inspectorToggle: 1
     validCheck: 1
     containingClass: {fileID: 1058662490}
-    expression: 45 + 7
+    expression: 45+2.4
   field2:
     inspectorToggle: 1
     validCheck: 1

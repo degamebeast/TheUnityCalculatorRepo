@@ -92,7 +92,7 @@ namespace delib.calculate
 
                 curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, EditorGUIUtility.singleLineHeight);
 
-                GUI.backgroundColor = validColor;
+                //GUI.backgroundColor = validColor;
                 GUIStyle textAreaStyle = new GUIStyle(GUI.skin.textArea);
                 textAreaStyle.richText = true;
 /*                int curKeyControl = GUIUtility.keyboardControl;
@@ -103,7 +103,7 @@ namespace delib.calculate
                 GUIUtility.hotControl = curHotControl*/;
                 string valHolder = EditorGUI.TextArea(curPosition, expressionString.stringValue,textAreaStyle);
                 GUI.backgroundColor = new Color(0, 0, 0, 0);
-                Expression labelExpress = new Expression(valHolder,true,true);
+                Expression labelExpress = new Expression(valHolder,false,true);
                 labelExpress.RemoveNulls();
                 string labelText = "";
 
