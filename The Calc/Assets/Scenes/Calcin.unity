@@ -1035,20 +1035,20 @@ MonoBehaviour:
   outputText: {fileID: 1017346224}
   textPreFab: {fileID: 7717357080427439117, guid: 3d4bfcfc215d15c4cb64f6b83875bc6e, type: 3}
   field:
-    inspectorToggle: 0
+    inspectorToggle: 1
     validCheck: 1
     containingClass: {fileID: 1058662490}
-    expression: arg0.Instance.testIt
+    expression: 45 + 7
   field2:
-    inspectorToggle: 0
+    inspectorToggle: 1
     validCheck: 1
     containingClass: {fileID: 1058662490}
-    expression: 47-8+6.2*6
+    expression: 
   field3:
-    inspectorToggle: 0
+    inspectorToggle: 1
     validCheck: 1
     containingClass: {fileID: 1058662490}
-    expression: arg3.intexample
+    expression: 
   VariableMemoryViewContent: {fileID: 1720167673}
 --- !u!1 &1256280177
 GameObject:

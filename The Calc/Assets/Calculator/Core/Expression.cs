@@ -16,7 +16,7 @@ namespace delib.calculate
         }
 
         //clean - whether or not the tokens should be cleaned up and compacted upon construction
-        public Expression(string initialExpr, bool clean = true) : base(Tokenize(initialExpr))
+        public Expression(string initialExpr, bool clean = true, bool markDelimetersAsInvalid = false) : base(Tokenize(initialExpr, markDelimetersAsInvalid))
         {
             if (clean)
                 CleanExpression();
@@ -31,7 +31,7 @@ namespace delib.calculate
 
         //calc - a calculator that all identifiers will be resolved to upon construction. This value IS NOT stored inside the expression afterwards
         //clean - whether or not the tokens should be cleaned up and compacted upon construction
-        public Expression(string initialExpr, Calculator calc, bool clean = true) : base(Tokenize(initialExpr))
+        public Expression(string initialExpr, Calculator calc, bool clean = true, bool markDelimetersAsInvalid = false) : base(Tokenize(initialExpr, markDelimetersAsInvalid))
         {
             calc.ResolveIdentifiers(this,true);
 
@@ -218,7 +218,7 @@ namespace delib.calculate
         }
 
         //converts a string into a list of token's
-        public static List<Token> Tokenize(string expr)
+        public static List<Token> Tokenize(string expr, bool markDelimitersAsInvalid = false)
         {
             List<Token> tokens = new List<Token>();
             List<char> digitBuffer = new List<char>();
@@ -260,14 +260,18 @@ namespace delib.calculate
 
                 TokenTypeValue charTypeVal;
 
-                if (Library.SymbolToTokenType.TryGetValue(character, out charTypeVal))
+                if (Library.SymbolTokenTypePairs.TryGetValue(character, out charTypeVal))
                 {
                     tokens.Add(new Token(charTypeVal));
                     continue;
                 }
 
                 if (Library.Delimiters.Contains(character))
+                {
+                    if (markDelimitersAsInvalid)
+                        tokens.Add(Token.InvalidToken);
                     continue;
+                }
 
                 tokens.Add(Token.InvalidToken);
             }

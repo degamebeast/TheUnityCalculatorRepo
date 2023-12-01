@@ -17,7 +17,7 @@ namespace delib.calculate
         };
 
         //which characters represent which token types
-        public static Dictionary<char, TokenTypeValue> SymbolToTokenType = new Dictionary<char, TokenTypeValue>()
+        public static BiDictionary<char, TokenTypeValue> SymbolTokenTypePairs = new BiDictionary<char, TokenTypeValue>()
         {
             {',' , TokenTypeValue.Seperator },
             {';' , TokenTypeValue.End_Statement },

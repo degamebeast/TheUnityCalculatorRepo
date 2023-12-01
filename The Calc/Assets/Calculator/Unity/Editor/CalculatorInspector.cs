@@ -3,6 +3,7 @@
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using TMPro;
 
 namespace delib.calculate
 {
@@ -38,7 +39,8 @@ namespace delib.calculate
             containingClassObject.objectReferenceValue = property.serializedObject.targetObject;
 
             Color origColor = GUI.color;
-            Color origBackColor = GUI.backgroundColor;
+            Color origBackgroundColor = GUI.backgroundColor;
+            Color origContentColor = GUI.contentColor;
             Color validColor = validCheckBool.boolValue? Color.green : Color.red;
 
 
@@ -91,7 +93,35 @@ namespace delib.calculate
                 curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, EditorGUIUtility.singleLineHeight);
 
                 GUI.backgroundColor = validColor;
-                expressionString.stringValue = EditorGUI.TextArea(curPosition, expressionString.stringValue);
+                GUIStyle textAreaStyle = new GUIStyle(GUI.skin.textArea);
+                textAreaStyle.richText = true;
+/*                int curKeyControl = GUIUtility.keyboardControl;
+                int curHotControl = GUIUtility.hotControl;
+                GUIUtility.keyboardControl = 0;
+                GUIUtility.hotControl = 0;
+                GUIUtility.keyboardControl = curKeyControl;
+                GUIUtility.hotControl = curHotControl*/;
+                string valHolder = EditorGUI.TextArea(curPosition, expressionString.stringValue,textAreaStyle);
+                GUI.backgroundColor = new Color(0, 0, 0, 0);
+                Expression labelExpress = new Expression(valHolder,true,true);
+                labelExpress.RemoveNulls();
+                string labelText = "";
+
+
+                foreach(Token toke in labelExpress)
+                {
+                    Color col = CalculatorHelper.TokenColor[toke.Type];
+                    if (toke.Type == TokenTypeValue.Invalid)
+                        labelText += " ";
+                    else
+                        labelText += $"<color=\"#{ColorUtility.ToHtmlStringRGBA(col)}\">{toke}</color>";
+                }
+
+                EditorGUI.LabelField(curPosition, labelText, textAreaStyle);
+
+                //valHolder = CalculatorHelper.RemoveAllRichText(valHolder);
+
+                expressionString.stringValue = valHolder;
             }
             GUILayout.EndVertical();
             // Set indent back to what it was
@@ -99,7 +129,8 @@ namespace delib.calculate
 
             EditorGUI.EndProperty();
 
-            GUI.backgroundColor = origBackColor;
+            GUI.contentColor = origContentColor;
+            GUI.backgroundColor = origBackgroundColor;
             GUI.color = origColor;
         }
 

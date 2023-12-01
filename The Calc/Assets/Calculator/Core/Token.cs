@@ -108,7 +108,23 @@ namespace delib.calculate
         }
 
 
+        public override string ToString()
+        {
+            if (IsNamedType(Type))
+                return ObjectName;
+            if (IsExpressiveType(Type))
+                return Expression.ToString();
+            if (Type.ResolvesTo(TokenTypeValue.Constant))
+                return Value.ToString();
 
+            char symbol;
+            if(Library.SymbolTokenTypePairs.TryGetValue(Type, out symbol))
+            {
+                return symbol.ToString();
+            }
+
+            return Type.ToString();
+        }
 
 
         #region static functions
