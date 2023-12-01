@@ -62,7 +62,6 @@ namespace delib.calculate
             GUI.backgroundColor = validColor;
             if(GUI.Button(postLabelPosition, "Validate"))
             {
-
                 Calculator varCheckCalc = property.serializedObject.targetObject.GetClassAsCalculator(propertyTypeGenericTypes);
                 validCheckBool.boolValue = Expression.Validate(expressionString.stringValue, varCheckCalc, propertyTypeGenericTypes);
             }
@@ -75,22 +74,21 @@ namespace delib.calculate
             GUILayout.BeginVertical();
             if (toggleBool.boolValue)
             {
-                float expandedSpacing = (EditorGUIUtility.singleLineHeight * 1.25f + EditorGUIUtility.standardVerticalSpacing);
+/*                float expandedSpacing = 0;
                 if (propertyType.IsGenericType)
                 {
                     int arraySize = propertyTypeGenericTypes.Length;
-                    if (arraySize == 0) arraySize = 1;
-                    expandedSpacing = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * (propertyType.IsGenericType ? (arraySize) : 1);
-                }
+                    expandedSpacing = standardSpacing * arraySize;
+                }*/
 
-                curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, expandedSpacing);
                 for(int i = 0; i < propertyTypeGenericTypes.Length; i++)
                 {
+                    curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, EditorGUIUtility.singleLineHeight);
                     EditorGUI.LabelField(curPosition, $"arg{i} |\tType: {propertyTypeGenericTypes[i].Name}");
                 }
 
 
-                curPosition = new Rect(startPosition.x, curPosition.y + expandedSpacing, startPosition.width, EditorGUIUtility.singleLineHeight);
+                curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, EditorGUIUtility.singleLineHeight);
 
                 GUI.backgroundColor = validColor;
                 expressionString.stringValue = EditorGUI.TextArea(curPosition, expressionString.stringValue);
@@ -109,6 +107,7 @@ namespace delib.calculate
         {
             System.Type propertyType = property.serializedObject.targetObject.GetType().GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
             System.Type[] propertyTypeGenericTypes = propertyType.GetGenericArguments();
+            float standardSpacing = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
 
             SerializedProperty expressionString = property.FindPropertyRelative("expression");
             SerializedProperty toggleBool = property.FindPropertyRelative("inspectorToggle");
@@ -124,10 +123,10 @@ namespace delib.calculate
                 {
                     int arraySize = propertyTypeGenericTypes.Length;
                     if (arraySize == 0) arraySize = 1;
-                    return standardHeight * 2 + ((arraySize) * (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing));
+                    return standardHeight * 2 + (arraySize * standardSpacing);
                 }
 
-                return standardHeight * 2 + (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+                return standardHeight + standardSpacing;
             }
             return standardHeight;
         }
