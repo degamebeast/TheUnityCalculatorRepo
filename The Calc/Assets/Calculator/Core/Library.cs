@@ -8,7 +8,10 @@ namespace delib.calculate
 {
     public static class Library
     {
+
+        //System.Reflection BindingFlag that grants access to all field variables
         public const BindingFlags AllClassVariablesBindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+
         //characters that act as seperators for each token value
         //extra and or excess delimiters are ignored
         public static List<char> Delimiters = new List<char>()
@@ -16,7 +19,7 @@ namespace delib.calculate
             ' '
         };
 
-        //which characters represent which token types
+        //which characters are paired with which token types
         public static BiDictionary<char, TokenTypeValue> SymbolTokenTypePairs = new BiDictionary<char, TokenTypeValue>()
         {
             {',' , TokenTypeValue.Seperator },

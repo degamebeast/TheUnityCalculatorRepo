@@ -410,6 +410,7 @@ namespace delib.calculate
         }
     }
 
+    //represents an evaluation argument
     public class Argument
     {
         public string ArgName { get; protected set; }

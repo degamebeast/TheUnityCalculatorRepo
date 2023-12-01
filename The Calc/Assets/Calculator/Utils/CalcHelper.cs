@@ -9,33 +9,34 @@ namespace delib.calculate
 {
     public static class CalcHelper
     {
-        public static Calculator ConvertClassToCalculator(System.Type obj, params object[] args)
+        //Creates a calculator from the given class type
+        public static Calculator ConvertClassToCalculator(System.Type type, params object[] args)
         {
             Calculator classContextCalc = new Calculator(args);
 
 
 
-            foreach (FieldInfo fi in obj.GetFields(Library.AllClassVariablesBindingFlag))
+            foreach (FieldInfo fi in type.GetFields(Library.AllClassVariablesBindingFlag))
             {
 
                 if (fi.FieldType == typeof(Constant))
                 {
-                    Constant val = fi.GetValue(obj) as Constant;
+                    Constant val = fi.GetValue(type) as Constant;
                     classContextCalc.AddVariableToMemory(fi.Name, val);
                 }
                 else if (fi.FieldType == typeof(float))
                 {
-                    float val = (float)fi.GetValue(obj);
+                    float val = (float)fi.GetValue(type);
                     classContextCalc.AddVariableToMemory(fi.Name, val);
                 }
                 else if (fi.FieldType == typeof(Integer))
                 {
-                    Integer val = fi.GetValue(obj) as Integer;
+                    Integer val = fi.GetValue(type) as Integer;
                     classContextCalc.AddVariableToMemory(fi.Name, val);
                 }
                 else if (fi.FieldType == typeof(int))
                 {
-                    int val = (int)fi.GetValue(obj);
+                    int val = (int)fi.GetValue(type);
                     classContextCalc.AddVariableToMemory(fi.Name, val);
                 }
 
@@ -43,6 +44,9 @@ namespace delib.calculate
 
             return classContextCalc;
         }
+
+        //removes rich text tag pairs from a  string
+        //NOTE: needs to be improved doesn't handle edge cases like unclosed tags
         public static string RemoveAllRichText(string str)
         {
             int gtIndex = -1;
@@ -92,6 +96,7 @@ namespace delib.calculate
 
     public static class CalculatorExtensionMethods
     {
+        //returns the type of the field located at the end of path or 'null' if path does not exist
         public static System.Type FindTypeFromPath(this System.Type type, string path)
         {
             string[] argPath = path.Split('.');
@@ -109,46 +114,19 @@ namespace delib.calculate
 
             return curType;
         }
+        //returns true if the path exists and false otherwise
         public static bool FieldPathIsValid(this System.Type type, string path)
         {
             return type.FindTypeFromPath(path) != null;
         }
+
         public static Calculator GetClassAsCalculator(this System.Object obj, params object[] args)
         {
-            Calculator classContextCalc = new Calculator(args);
-
-
-
-            foreach (FieldInfo fi in obj.GetType().GetFields(Library.AllClassVariablesBindingFlag))
-            {
-
-                if (fi.FieldType == typeof(Constant))
-                {
-                    Constant val = fi.GetValue(obj) as Constant;
-                    classContextCalc.AddVariableToMemory(fi.Name, val);
-                }
-                else if (fi.FieldType == typeof(float))
-                {
-                    float val = (float)fi.GetValue(obj);
-                    classContextCalc.AddVariableToMemory(fi.Name, val);
-                }
-                else if (fi.FieldType == typeof(Integer))
-                {
-                    Integer val = fi.GetValue(obj) as Integer;
-                    classContextCalc.AddVariableToMemory(fi.Name, val);
-                }
-                else if (fi.FieldType == typeof(int))
-                {
-                    int val = (int)fi.GetValue(obj);
-                    classContextCalc.AddVariableToMemory(fi.Name, val);
-                }
-
-            }
-
-            return classContextCalc;
+            return CalcHelper.ConvertClassToCalculator(obj.GetType(),args);
         }
     }
 
+    //a 2 way dictionary that allows for the 'key' and 'value' to be mutually paired
     public class BiDictionary<TKey, TValue> : IEnumerable
     {
         private Dictionary<TKey, TValue> dict;

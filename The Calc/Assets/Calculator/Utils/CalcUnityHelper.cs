@@ -7,6 +7,8 @@ namespace delib.calculate.unity
 {
     public static class CalcUnityHelper
     {
+        //the default color settings for each token type
+        //NOTE: every token MUST have an entry in this dictionary
         public static Dictionary<TokenTypeValue, Color> TokenInspectorColor = new Dictionary<TokenTypeValue, Color>()
         {
             {TokenTypeValue.Null, Color.white},

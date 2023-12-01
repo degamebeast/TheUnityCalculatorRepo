@@ -123,6 +123,7 @@ namespace delib.calculate
         }
 
         private TreeNode root;
+        //this list of arguments to be considered when evaluating this tree
         private System.Type[] argumentTypes;
 
         public EvaluationTree(params System.Type[] argTypes)
@@ -148,11 +149,6 @@ namespace delib.calculate
         public EvaluationTree(Expression expr, params System.Type[] argTypes)
         {
             GenerateTree(expr, this, argTypes);
-/*            if (root != null)
-            {
-                root.subTree = this;
-            }*/
-
         }
 
         //generates a tree based on the passed in expression
@@ -225,6 +221,7 @@ namespace delib.calculate
             if (node.token.Type == TokenTypeValue.Invalid)//SELF NOTE: the following statement is no longer necessarily true however the implication still has merit (if an expression has unresolved identfiers then a result cannot be generated and thus it is an invalid expression)
                 return false;
 
+            //arguments must additionally be check to see if there fieldpath is valid
             if (node.token.Type == TokenTypeValue.Argument)
             {
                 string[] argPath = node.token.ObjectName.Split('.');
