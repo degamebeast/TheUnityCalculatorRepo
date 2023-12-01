@@ -10,32 +10,32 @@ namespace delib.calculate
     public class Function
     {
         public string FuncName { get; protected set; }
-        public int ArgCount { get; protected set; }
+        public int ParamCount { get; protected set; }
 
         protected CalculatorFunction calculatorFunction;
 
         public Function()
         {
             FuncName = null;
-            ArgCount = 0;
+            ParamCount = 0;
             calculatorFunction = null;
         }
 
         public Function(string name, int numArgs, CalculatorFunction val)
         {
             FuncName = name;
-            ArgCount = numArgs;
+            ParamCount = numArgs;
             calculatorFunction = val;
         }
 
-        //will ignore excess arguments passed in
+        //will ignore excess parameters passed in
         public virtual Constant Call(Calculator calc, params Token[] args)
         {
             if (calculatorFunction == null)
                 return null;
 
-            if (ArgCount != args.Length)
-                throw new ArgumentException($"Incorrect number of arguments in Function.Call\nWas given: {args.Length}\nExpected: {ArgCount}", "args");
+            if (ParamCount != args.Length)
+                throw new ArgumentException($"Incorrect number of parameters in Function.Call\nWas given: {args.Length}\nExpected: {ParamCount}", "args");
 
             if (calc == null)
                 calc = new Calculator();
@@ -45,19 +45,19 @@ namespace delib.calculate
         }
     }
 
-    //Function class for basic operations (those that take 2 arguments)
+    //Function class for basic operations (those that take 2 parameters)
     public class OperationFunction : Function
     {
         public OperationFunction()
         {
             FuncName = "Operation";
-            ArgCount = 2;
+            ParamCount = 2;
             calculatorFunction = null;
         }
         public OperationFunction(CalculatorFunction operation)
         {
             FuncName = "Operation";
-            ArgCount = 2;
+            ParamCount = 2;
             calculatorFunction = operation;
         }
     }

@@ -123,7 +123,7 @@ namespace delib.calculate
                         {
                             Expression paren = new Expression(expr.GetRange(start + 1, end - 1 - start));
                             if (expr[start - 1].Type == TokenTypeValue.Function)
-                                expr[start] = new Token(paren, TokenTypeValue.Arguments);
+                                expr[start] = new Token(paren, TokenTypeValue.Parameters);
                             else
                                 expr[start] = new Token(paren);
 
@@ -135,25 +135,37 @@ namespace delib.calculate
                 }
             }
 
-            //Converts all decimal point tokens into floating point numbers
+            //Converts all decimal point tokens into floating point numbers and or Arguments
             for (int index = expr.Count - 1; index >= 0; index--)
             {
                 Token symbol = expr[index];
-                if (symbol.Type != TokenTypeValue.Decimal_Point) continue;
+                if (symbol.Type != TokenTypeValue.Dot) continue;
 
                 Token prev = expr[index - 1];
                 Token next = expr[index + 1];
-                if (prev.Type != TokenTypeValue.Integer)
-                {
-                    expr[index] = new Token(new Constant(float.Parse($"0.{next.Value}")));
-                    expr.RemoveAt(index + 1);
 
-                }
-                else
+                if(next.Type == TokenTypeValue.Identifier)
                 {
-                    expr[index - 1] = new Token(new Constant(float.Parse($"{(Integer)prev.Value}.{(Integer)next.Value}")));
-                    expr.RemoveRange(index, 2);
+                    if (prev.Type == TokenTypeValue.Identifier)
+                    {
+                        expr[index - 1] = new Token($"{prev.ObjectName}.{next.ObjectName}");
+                        expr.RemoveRange(index, 2);
+                    }
                 }
+                else if(next.Type == TokenTypeValue.Integer)
+                {
+                    if (prev.Type == TokenTypeValue.Integer)
+                    {
+                        expr[index - 1] = new Token(new Constant(float.Parse($"{(Integer)prev.Value}.{(Integer)next.Value}")));
+                        expr.RemoveRange(index, 2);
+                    }
+                    else
+                    {
+                        expr[index] = new Token(new Constant(float.Parse($"0.{next.Value}")));
+                        expr.RemoveAt(index + 1);
+                    }
+                }
+
             }
             //converts any 'subtraction' tokens that are representing negation into a negitive number
             for (int index = expr.Count - 1; index >= 0; index--)
@@ -174,18 +186,18 @@ namespace delib.calculate
         }
 
         //does not change/alter invoking object
-        public Expression GetResolveArguments()
+        public Expression GetResolveParameters()
         {
-            return ResolveArguments(this);
+            return ResolveParameters(this);
         }
 
         //returns a new Expression with the given arguments resolved down to there respective types
         //the passed in expr is not altered
-        public static Expression ResolveArguments(Expression expr)
+        public static Expression ResolveParameters(Expression expr)
         {
             Expression copy = new Expression(expr);
             copy.RemoveNulls();
-            List<Token> arguments = new List<Token>();
+            List<Token> parameters = new List<Token>();
 
             int curStatementTracker = 0;
 
@@ -193,16 +205,16 @@ namespace delib.calculate
             {
                 if (copy[i].Type == TokenTypeValue.Seperator)
                 {
-                    arguments.Add(new Token(new Expression(copy.GetRange(curStatementTracker, i - curStatementTracker))));
+                    parameters.Add(new Token(new Expression(copy.GetRange(curStatementTracker, i - curStatementTracker))));
                     curStatementTracker = i + 1;
                 }
             }
             if (curStatementTracker < copy.Count)
             {
-                arguments.Add(new Token(new Expression(copy.GetRange(curStatementTracker, copy.Count - curStatementTracker))));
+                parameters.Add(new Token(new Expression(copy.GetRange(curStatementTracker, copy.Count - curStatementTracker))));
             }
 
-            return new Expression(arguments);
+            return new Expression(parameters);
         }
 
         //converts a string into a list of token's
@@ -280,27 +292,33 @@ namespace delib.calculate
             return new EvaluationTree(this);
         }
 
-        public static bool Validate(string expr)
+        public static bool Validate(string expr, params System.Type[] argTypes)
         {
-            return new Expression(expr).Validate();
+            return new Expression(expr).Validate(null, argTypes);
         }
 
-        public static bool Validate(string expr, Calculator calc)
+        public static bool Validate(string expr, Calculator calc, params System.Type[] argTypes)
         {
-            return calc.ResolveIdentifiers(new Expression(expr)).Validate();
+            return calc.ResolveIdentifiers(new Expression(expr)).Validate(calc, argTypes);
         }
 
         //returns true if this is a valid programmatical-mathematical expression (Within the context of this project). False otherwise
-        public bool Validate(Calculator resCalc = null)
+        public bool Validate(Calculator resCalc = null, params System.Type[] argTypes)
         {
             if (Find(token => token.Type == TokenTypeValue.Invalid) != null) return false;
+
+
 
             bool valid = true;
             foreach (Expression expr in GetStatements())
             {
                 if (resCalc != null)
+                {
+                    resCalc.SetArguments(argTypes);
                     resCalc.ResolveIdentifiers(expr);
-                if (!new EvaluationTree(expr).Validate())
+                }
+
+                if (!new EvaluationTree(expr, argTypes).Validate())
                 {
                     valid = false;
                     break;

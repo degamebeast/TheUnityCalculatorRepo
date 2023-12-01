@@ -1,7 +1,7 @@
 //Created by: Deontae Albertie
 
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Reflection;
 
 namespace delib.calculate
 {
@@ -10,24 +10,28 @@ namespace delib.calculate
     {
         public Dictionary<string, Function> functionMemory;//all the functions stored in this calculator instance
         public Dictionary<string, Variable> variableMemory;//all the variables stored in this calculator instance
+        protected Dictionary<string, Argument> argumentMemory;//the arguments stored in this calculator instance (from the most recent call to calculate)
 
-        public Calculator()
+        public Calculator(params object[] initArgs)
         {
             functionMemory = new Dictionary<string, Function>(Library.defaultFunctions);
             variableMemory = new Dictionary<string, Variable>();
             variableMemory.Add("ans", new Variable("ans"));
             variableMemory.Add("NaN", new Variable("NaN", float.NaN));
+            argumentMemory = new Dictionary<string, Argument>();
+            SetArguments(initArgs);
 
         }
 
-        public Constant Calculate(string expr)
+        public Constant Calculate(string expr, params object[] args)
         {
-            return Calculate(new Expression(expr));
+            return Calculate(new Expression(expr),args);
         }
 
         //solves the given expression and then stores the answer inside of the "ans" calculator variable
-        public Constant Calculate(Expression expr)
+        public Constant Calculate(Expression expr, params object[] args)
         {
+            SetArguments(args);
             Expression[] statements = expr.GetStatements();
 
             foreach (Expression statementExpr in statements)
@@ -36,6 +40,16 @@ namespace delib.calculate
             }
 
             return variableMemory["ans"].Value;
+        }
+
+        public void SetArguments(params object[] args)
+        {
+            argumentMemory.Clear();
+            for (int i = 0; i < args.Length; i++)
+            {
+                string argName = $"arg{i}";
+                argumentMemory.Add(argName, new Argument(argName, args[i]));
+            }
         }
 
         //resolves the given expression down to a single constant token
@@ -117,11 +131,20 @@ namespace delib.calculate
                 {
                     Function funct;
                     Variable var;
+                    Argument arg;
                     if (functionMemory.TryGetValue(cur.ObjectName, out funct))
                     {
                         expr[i] = new Token(cur.ObjectName, TokenTypeValue.Function);
                         continue;
                     }
+
+                    string[] argSplit = cur.ObjectName.Split('.');
+                    if (argumentMemory.TryGetValue(argSplit[0], out arg))
+                    {
+                        expr[i] = new Token(cur.ObjectName, TokenTypeValue.Argument);
+                        continue;
+                    }
+
 
                     if (variableMemory.TryGetValue(cur.ObjectName, out var))
                     {
@@ -140,6 +163,42 @@ namespace delib.calculate
             return expr;
         }
 
+        public Constant ResolveArgument(string resArg)
+        {
+            string[] argPath = resArg.Split('.');
+            object arg = argumentMemory[argPath[0]].ObjectValue;
+
+            object curField = arg;
+
+            for (int argIndex = 1; argIndex < argPath.Length; argIndex++)
+            {
+                System.Type curType = curField.GetType();
+                FieldInfo curFieldInfo = curType.GetField($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
+                if (curFieldInfo == null)
+                    return null;
+                curField = curFieldInfo.GetValue(curField);
+            }
+
+            Constant resolvedField = null;
+            switch (curField)
+            {
+                case Integer:
+                    resolvedField = curField as Integer;
+                    break;
+                case int:
+                    resolvedField = new Integer((int)curField);
+                    break;
+                case Constant:
+                    resolvedField = curField as Constant;
+                    break;
+                case float:
+                    resolvedField = new Constant((float)curField);
+                    break;
+            }
+
+            return resolvedField;
+        }
+
 
         //takes the token at the given 'index' in 'expr' and reolves it using it's left and right nieghbors as operands
         // returns which index the calculator should now be pointing at
@@ -149,6 +208,9 @@ namespace delib.calculate
             {
                 case TokenTypeValue.Null://if null then just continue looping
                     return index + 1;
+                case TokenTypeValue.Argument://---
+                    expr[index] = new Token(ResolveArgument(expr[index].ObjectName));
+                    return index;
                 case TokenTypeValue.Variable://if a variable, resolve down to it's stored Constant
                     if (expr[index + 1].Type == TokenTypeValue.Assignment)
                         return index + 1;
@@ -166,7 +228,7 @@ namespace delib.calculate
                     Token symbol = expr[index];
                     Token next = expr[index + 1];
                     Operation currentOp = new Operation(symbol.Type, new Operands(prev.Type, next.Type));
-                    UnityEngine.Debug.Log(currentOp);
+                    //UnityEngine.Debug.Log(currentOp);
 
                     Function funct = Library.defaultOperations[currentOp];
                     expr[index - 1] = new Token(funct.Call(this, prev, next));
@@ -192,21 +254,21 @@ namespace delib.calculate
             return newVar.Value;
         }
 
-        //calls the function of name(args[0].ObjectName) in the given calculator and gives it the arguments-expression that is stored in args[1] for it's parameters
+        //calls the function of name(args[0].ObjectName) in the given calculator and gives it the parameters-expression that is stored in args[1] for it's parameters
         public static Constant FunctionCall(Calculator calc, params Token[] args)
         {
             Function curFunct = null;
             if (calc.functionMemory.TryGetValue(args[0].ObjectName, out curFunct))
             {
-                Expression arguments = args[1].Expression.GetResolveArguments();
+                Expression parameters = args[1].Expression.GetResolveParameters();
 
-                for (int i = 0; i < arguments.Count; i++)
+                for (int i = 0; i < parameters.Count; i++)
                 {
-                    if (arguments[i].Type == TokenTypeValue.Null) continue;
-                    arguments[i] = new Token(calc.ExpressResult(arguments[i].Expression));
+                    if (parameters[i].Type == TokenTypeValue.Null) continue;
+                    parameters[i] = new Token(calc.ExpressResult(parameters[i].Expression));
                 }
 
-                return curFunct.Call(calc, arguments.RemoveNulls().ToArray());
+                return curFunct.Call(calc, parameters.RemoveNulls().ToArray());
             }
 
             return null;
@@ -327,6 +389,38 @@ namespace delib.calculate
         public virtual void Set(Constant value)
         {
             Value = value;
+        }
+    }
+
+    public class Argument
+    {
+        public string ArgName { get; protected set; }
+
+        public System.Type ArgType { get; set; }
+        public object ObjectValue { get; set; }
+        public bool Assigned
+        {
+            get
+            {
+                return ObjectValue != null;
+            }
+        }
+
+        public Argument()
+        {
+            ArgName = null;
+            ArgType = null;
+            ObjectValue = null;
+        }
+
+        public Argument(string name, object obj = null)
+        {
+            ArgName = name;
+            ArgType = obj.GetType();
+            ObjectValue = obj;
+
+            if (obj is System.Type)
+                ArgType = (System.Type)obj;
         }
     }
 

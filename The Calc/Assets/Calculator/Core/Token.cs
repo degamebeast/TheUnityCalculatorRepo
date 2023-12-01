@@ -4,7 +4,7 @@ using System;
 
 namespace delib.calculate
 {
-    public enum TokenTypeValue { Null, Invalid, Any, Identifier, Constant, Integer, Variable, Expression, Function, Arguments, Decimal_Point, Open_Paren, Close_Paren, Seperator, End_Statement, Operation, Exponent, Multiplication, Division, Modulo, Addition, Subtraction, Assignment, Left_Shift, Right_Shift }
+    public enum TokenTypeValue { Null, Invalid, Any, Identifier, Constant, Integer, Variable, Expression, Function, Parameters, Argument, Dot, Open_Paren, Close_Paren, Seperator, End_Statement, Operation, Exponent, Multiplication, Division, Modulo, Addition, Subtraction, Assignment, Left_Shift, Right_Shift }
 
     //The key class for creating expression
     //represents a singular piece of an expression Ex. '6' '^' '+' '34' 'var'
@@ -16,6 +16,9 @@ namespace delib.calculate
 
         public Constant Value { get; protected set; }
         public Expression Expression { get; protected set; }
+
+        //any additional value or data that should be passed along with this token
+        public object TokenInfo { get; set; }
 
         //the calculation priority of this token's type
         public uint Priority
@@ -97,7 +100,7 @@ namespace delib.calculate
         public Token(string identity, TokenTypeValue namedType = TokenTypeValue.Identifier)
         {
             if (!IsNamedType(namedType))
-                throw new ArgumentException("Argument was not a valid token type for the given constructor", "namedType");
+                throw new ArgumentException("Parameter was not a valid token type for the given constructor", "namedType");
             Type = new TokenType(namedType);
             Value = null;
             ObjectName = identity;

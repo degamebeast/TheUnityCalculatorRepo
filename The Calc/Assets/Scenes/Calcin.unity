@@ -1036,14 +1036,16 @@ MonoBehaviour:
   textPreFab: {fileID: 7717357080427439117, guid: 3d4bfcfc215d15c4cb64f6b83875bc6e, type: 3}
   field:
     inspectorToggle: 1
-    validCheck: 1
+    validCheck: 0
+    parameterTypes: []
     containingClass: {fileID: 1058662490}
-    expression: 12+3 + intexample * intexample2
+    expression: 12 + test * 2 + arg0.testit
   field2:
     inspectorToggle: 1
     validCheck: 1
+    parameterTypes: []
     containingClass: {fileID: 1058662490}
-    expression: 7/6.0
+    expression: 47-8+6.2*6
   VariableMemoryViewContent: {fileID: 1720167673}
 --- !u!1 &1256280177
 GameObject:

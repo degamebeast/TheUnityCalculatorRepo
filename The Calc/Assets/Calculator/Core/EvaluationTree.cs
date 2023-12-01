@@ -123,32 +123,36 @@ namespace delib.calculate
         }
 
         private TreeNode root;
+        private System.Type[] argumentTypes;
 
-        public EvaluationTree()
+        public EvaluationTree(params System.Type[] argTypes)
         {
             root = null;
+            argumentTypes = argTypes;
         }
 
-        public EvaluationTree(Token token) : this(new TreeNode(token))
+        public EvaluationTree(Token token, params System.Type[] argTypes) : this(new TreeNode(token), argTypes)
         {
 
         }
-        protected EvaluationTree(TreeNode node)
+        protected EvaluationTree(TreeNode node, params System.Type[] argTypes)
         {
             root = node;
             if (root != null)
             {
                 root.subTree = this;
             }
+            argumentTypes = argTypes;
         }
 
-        public EvaluationTree(Expression expr)
+        public EvaluationTree(Expression expr, params System.Type[] argTypes)
         {
             GenerateTree(expr, this);
             if (root != null)
             {
                 root.subTree = this;
             }
+            argumentTypes = argTypes;
         }
 
         //generates a tree based on the passed in expression
@@ -217,6 +221,23 @@ namespace delib.calculate
 
             if (node.token.Type == TokenTypeValue.Invalid || node.token.Type == TokenTypeValue.Identifier)//if an expression has unresolved identfiers then a result cannot be generated and thus it is an invalid expression
                 return false;
+
+            if (node.token.Type == TokenTypeValue.Argument)
+            {
+                string[] argPath = node.token.ObjectName.Split('.');
+                string remainingPath = "";
+                for(int pathIndex = 1; pathIndex < argPath.Length; pathIndex++)
+                {
+                    remainingPath += $".{argPath[pathIndex]}";
+                }
+                if(remainingPath != "")
+                {
+                    remainingPath = remainingPath.Remove(0, 1);
+                }
+                int argNum = int.Parse(argPath[0].Remove(0, 3));
+                return node.subTree.argumentTypes[argNum].FieldPathIsValid(remainingPath);
+            }
+
 
             if (node.IsLeaf)
                 return node.token.Type.ResolvesTo(TokenTypeValue.Constant) || node.token.Type.ResolvesTo(TokenTypeValue.Null);

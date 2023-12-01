@@ -2,11 +2,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace delib.calculate
 {
     public static class Library
     {
+        public const BindingFlags AllClassVariablesBindingFlag = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
         //characters that act as seperators for each token value
         //extra and or excess delimiters are ignored
         public static List<char> Delimiters = new List<char>()
@@ -27,7 +29,7 @@ namespace delib.calculate
             {'%' , TokenTypeValue.Modulo },
             {'+' , TokenTypeValue.Addition },
             {'-' , TokenTypeValue.Subtraction},
-            {'.' , TokenTypeValue.Decimal_Point },
+            {'.' , TokenTypeValue.Dot },
             {'^' , TokenTypeValue.Exponent },
             {'<' , TokenTypeValue.Left_Shift },
             {'>' , TokenTypeValue.Right_Shift },
@@ -42,14 +44,14 @@ namespace delib.calculate
         {
             {TokenTypeValue.Null, 0},
             {TokenTypeValue.Operation, 0},
-            {TokenTypeValue.Decimal_Point, 0},
+            {TokenTypeValue.Dot, 0},
             {TokenTypeValue.Seperator, 0},
             {TokenTypeValue.End_Statement, 0},
             {TokenTypeValue.Open_Paren, 0},
             {TokenTypeValue.Close_Paren, 0},
 
 
-            {TokenTypeValue.Arguments, 7},
+            {TokenTypeValue.Parameters, 7},
             {TokenTypeValue.Invalid, 7},
             {TokenTypeValue.Identifier, 7},
             {TokenTypeValue.Integer, 7},
@@ -58,6 +60,7 @@ namespace delib.calculate
             {TokenTypeValue.Function, 6},
 
             {TokenTypeValue.Expression, 5},
+            {TokenTypeValue.Argument, 5},
             {TokenTypeValue.Variable, 5},
 
 
@@ -94,8 +97,9 @@ namespace delib.calculate
                     TokenTypeValue.Variable,
                     TokenTypeValue.Expression,
                     TokenTypeValue.Function,
-                    TokenTypeValue.Arguments,
-                    TokenTypeValue.Decimal_Point,
+                    TokenTypeValue.Parameters,
+                    TokenTypeValue.Argument,
+                    TokenTypeValue.Dot,
                     TokenTypeValue.Open_Paren,
                     TokenTypeValue.Close_Paren,
                     TokenTypeValue.Seperator,
@@ -119,8 +123,9 @@ namespace delib.calculate
                     TokenTypeValue.Constant,
                     TokenTypeValue.Integer,
                     TokenTypeValue.Variable,
+                    TokenTypeValue.Argument,
                     TokenTypeValue.Expression,
-                    TokenTypeValue.Arguments
+                    TokenTypeValue.Parameters
                 }
             },
             {
@@ -128,6 +133,7 @@ namespace delib.calculate
                 new List<TokenTypeValue>()
                 {
                     TokenTypeValue.Variable,
+                    TokenTypeValue.Argument,
                     TokenTypeValue.Identifier
                 }
             },
@@ -136,7 +142,7 @@ namespace delib.calculate
                 new List<TokenTypeValue>()
                 {
                     TokenTypeValue.Expression,
-                    TokenTypeValue.Arguments
+                    TokenTypeValue.Parameters
                 }
             },
             {
@@ -253,7 +259,7 @@ namespace delib.calculate
                 TokenTypeValue.Function,
                 new List<Operands>()
                 {
-                    new Operands(TokenTypeValue.Any, TokenTypeValue.Arguments),
+                    new Operands(TokenTypeValue.Any, TokenTypeValue.Parameters),
                 }
             }
         };
@@ -263,6 +269,7 @@ namespace delib.calculate
         {
             TokenTypeValue.Identifier,
             TokenTypeValue.Variable,
+            TokenTypeValue.Argument,
             TokenTypeValue.Function
         };
 
@@ -270,7 +277,16 @@ namespace delib.calculate
         public static List<TokenTypeValue> ExpressiveTypes = new List<TokenTypeValue>()
         {
             TokenTypeValue.Expression,
-            TokenTypeValue.Arguments
+            TokenTypeValue.Parameters
+        };
+
+        //list of all Types that are considered valid Constant inputs
+        public static List<System.Type> CaclulatorConstantTypes = new List<System.Type>()
+        {
+            typeof(Constant),
+            typeof(Integer),
+            typeof(float),
+            typeof(int),
         };
 
         //basic calculator operations

@@ -8,7 +8,14 @@ public class GameManager : MonoBehaviour
 {
     public class TestingClass
     {
+        public static TestingClass Instance;
         //public ExpressionField field2 = new ExpressionField();
+        public int testIt;
+
+        public TestingClass()
+        {
+            Instance = this;
+        }
     }
     public static GameManager Instance { get; private set; }
 
@@ -19,7 +26,7 @@ public class GameManager : MonoBehaviour
 
     public TMP_Text textPreFab;
 
-    public ExpressionField field;
+    public ExpressionField<TestingClass> field;
     public ExpressionField field2;
     public GameObject VariableMemoryViewContent;
 
@@ -32,12 +39,18 @@ public class GameManager : MonoBehaviour
     private Integer intexample;
     private int intexample2;
 
+    private int rest;
+
     private Calculator calc;
 
     private void Awake()
     {
+        rest = 3;
         cobo = 10;
         TestingClass classs = new TestingClass();
+        classs.testIt = 5;
+
+
         Instance = this;
 
         test = 9;
@@ -52,7 +65,7 @@ public class GameManager : MonoBehaviour
         //Expression ex = classs.field2.ContainingClassContextFieldExpression;
         //CalculateExpress(field.RawFieldExpression);
         //CalculateExpress(field.RawFieldExpression);
-        Debug.Log(field.Evaluate());
+        Debug.Log(field.Evaluate(classs));
         Debug.Log(field2.Evaluate());
         //CalculateExpress(field.ContainingClassContextFieldExpression);
         //CalculateExpress(classs.field2.ContainingClassContextFieldExpression);
