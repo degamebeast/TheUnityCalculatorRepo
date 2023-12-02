@@ -1037,16 +1037,19 @@ MonoBehaviour:
   field:
     inspectorToggle: 1
     validCheck: 1
+    lineHeight: 40
     containingClass: {fileID: 1058662490}
     expression: 
   field2:
     inspectorToggle: 0
     validCheck: 1
+    lineHeight: 40
     containingClass: {fileID: 1058662490}
     expression: 
   field3:
-    inspectorToggle: 1
+    inspectorToggle: 0
     validCheck: 1
+    lineHeight: 40
     containingClass: {fileID: 1058662490}
     expression: 
   VariableMemoryViewContent: {fileID: 1720167673}

@@ -25,7 +25,7 @@ namespace delib.calculate.unity
             float standardSpacing = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
 
             //Get access to the current properties Type information
-            System.Type propertyType = property.serializedObject.targetObject.GetType().GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
+            System.Type propertyType = property.serializedObject.targetObject.FindObjectFromPath(property.propertyPath).GetType();//.GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
             System.Type[] propertyTypeGenericTypes = propertyType.GetGenericArguments();
 
             //property's internal property variables
@@ -33,6 +33,7 @@ namespace delib.calculate.unity
             SerializedProperty toggleBool = property.FindPropertyRelative("inspectorToggle");
             SerializedProperty validCheckBool = property.FindPropertyRelative("validCheck");
             SerializedProperty containingClassObject = property.FindPropertyRelative("containingClass");
+            SerializedProperty lineHeightFloat = property.FindPropertyRelative("lineHeight");
             #endregion
 
             //assigning the current property position tracker to it's default value
@@ -102,12 +103,15 @@ namespace delib.calculate.unity
 
 
                 //create textArea style
+                Font font = Resources.Load<FontAsset>("ExpressionFieldTextAreaFont").sourceFontFile;
                 GUIStyle textAreaStyle = new GUIStyle(GUI.skin.textArea);
                 textAreaStyle.richText = true;
-                textAreaStyle.font = Resources.Load<FontAsset>("ExpressionFieldTextAreaFont").sourceFontFile;
+                textAreaStyle.font = font;
 
                 //create textArea for user input
-                curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, EditorGUIUtility.singleLineHeight);
+                int linesNeeded = (int)(CalcUnityHelper.GetTextWidth(expressionString.stringValue, font, textAreaStyle.fontSize) / startPosition.width) + 2;
+                lineHeightFloat.floatValue = linesNeeded * standardSpacing;
+                curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, lineHeightFloat.floatValue);
                 string valHolder = EditorGUI.TextArea(curPosition, expressionString.stringValue,textAreaStyle);
                 
                 //create label directly over textArea to display text with coloring
@@ -126,7 +130,7 @@ namespace delib.calculate.unity
                     string tokeText = toke.ToString();
                     //removes any differences between what has been typed and what is being presented to the user
                     //NOTE: this for loop is wildly unsafe, will eventually need to improve
-                    for(int i = 0; i < tokeText.Length;)
+/*                    for(int i = 0; i < tokeText.Length;)
                     {
                         if (valHolder[textIndex] != tokeText[i])
                         {
@@ -135,7 +139,7 @@ namespace delib.calculate.unity
                         }
                         i++;
                         textIndex++;
-                    }
+                    }*/
 
                     if (toke.Type == TokenTypeValue.Invalid)
                         labelText += $"<color=\"#{ColorUtility.ToHtmlStringRGBA(col)}\">_</color>";
@@ -185,6 +189,7 @@ namespace delib.calculate.unity
             SerializedProperty toggleBool = property.FindPropertyRelative("inspectorToggle");
             SerializedProperty validCheckBool = property.FindPropertyRelative("validCheck");
             SerializedProperty containingClassObject = property.FindPropertyRelative("containingClass");
+            SerializedProperty lineHeightFloat = property.FindPropertyRelative("lineHeight");
             #endregion
 
             float standardHeight = base.GetPropertyHeight(property, label);
@@ -197,10 +202,10 @@ namespace delib.calculate.unity
                 {
                     int arraySize = propertyTypeGenericTypes.Length;
                     if (arraySize == 0) arraySize = 1;
-                    return standardHeight * 2 + (arraySize * standardSpacing);
+                    return standardHeight + (arraySize * standardSpacing) + lineHeightFloat.floatValue;
                 }
 
-                return standardHeight + standardSpacing;
+                return standardHeight + standardSpacing + lineHeightFloat.floatValue;
             }
 
             return standardHeight;

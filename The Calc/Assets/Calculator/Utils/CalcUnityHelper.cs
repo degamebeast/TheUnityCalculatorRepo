@@ -7,6 +7,22 @@ namespace delib.calculate.unity
 {
     public static class CalcUnityHelper
     {
+        public static int GetTextWidth(string text, Font textFont, int size = 0, FontStyle fontStyle = FontStyle.Normal)
+        {
+            textFont.RequestCharactersInTexture(text, size, fontStyle);
+
+            int textWidth = 0;
+
+
+            CharacterInfo curInfo = new CharacterInfo();
+            for (int stringIndex = 0; stringIndex < text.Length; stringIndex++)
+            {
+                textFont.GetCharacterInfo(text[stringIndex], out curInfo, size, fontStyle);
+                textWidth += curInfo.advance;
+            }
+
+            return textWidth;
+        }
         //the default color settings for each token type
         //NOTE: every token MUST have an entry in this dictionary
         public static Dictionary<TokenTypeValue, Color> TokenInspectorColor = new Dictionary<TokenTypeValue, Color>()

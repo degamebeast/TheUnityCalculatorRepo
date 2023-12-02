@@ -14,6 +14,8 @@ namespace delib.calculate.unity
         [SerializeField] private bool inspectorToggle = true;
         //control to determine whether the Valid or Invalid graphic should be displayed
         [SerializeField] private bool validCheck = true;
+        //the height of the expression textArea factoring in the current inspector width
+        [SerializeField] private float lineHeight = 0;
         #endregion
         //The class that this ExpressionField belongs to
         [SerializeField] protected UnityEngine.Object containingClass = null;//This variable is set through the inspector but, still has purpose in the class instance

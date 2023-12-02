@@ -19,26 +19,7 @@ namespace delib.calculate
             foreach (FieldInfo fi in type.GetFields(Library.AllClassVariablesBindingFlag))
             {
 
-                if (fi.FieldType == typeof(Constant))
-                {
-                    Constant val = fi.GetValue(type) as Constant;
-                    classContextCalc.AddVariableToMemory(fi.Name, val);
-                }
-                else if (fi.FieldType == typeof(float))
-                {
-                    float val = (float)fi.GetValue(type);
-                    classContextCalc.AddVariableToMemory(fi.Name, val);
-                }
-                else if (fi.FieldType == typeof(Integer))
-                {
-                    Integer val = fi.GetValue(type) as Integer;
-                    classContextCalc.AddVariableToMemory(fi.Name, val);
-                }
-                else if (fi.FieldType == typeof(int))
-                {
-                    int val = (int)fi.GetValue(type);
-                    classContextCalc.AddVariableToMemory(fi.Name, val);
-                }
+                classContextCalc.AddVariableToMemory(fi.Name, null);
 
             }
 
@@ -97,6 +78,40 @@ namespace delib.calculate
     public static class CalculatorExtensionMethods
     {
         //returns the type of the field located at the end of path or 'null' if path does not exist
+        public static object FindObjectFromPath(this object obj, string path)
+        {
+            string[] objPath = path.Split('.');
+
+            object curObj = obj;
+            System.Type curType = curObj.GetType();
+
+            for (int objIndex = 0; objIndex < objPath.Length; objIndex++)
+            {
+                string curPath = objPath[objIndex];
+
+                if (curPath == "Array")
+                {
+                    curPath = "_items";
+                }
+
+                if (curType.IsArray)
+                {
+                    int arrayIndex = int.Parse(curPath.Substring(curPath.IndexOf('[') + 1, 1));
+                    curObj = ((object[])curObj)[arrayIndex];
+                    curType = curObj.GetType();
+                    continue;
+                }
+                FieldInfo curFieldInfo = curType.GetField($"{curPath}", Library.AllClassVariablesBindingFlag);
+                if (curFieldInfo == null)
+                    return null;
+                curObj = curFieldInfo.GetValue(curObj);
+                curType = curObj.GetType();
+            }
+
+            return curObj;
+        }
+
+        //returns the type of the field located at the end of path or 'null' if path does not exist
         public static System.Type FindTypeFromPath(this System.Type type, string path)
         {
             string[] argPath = path.Split('.');
@@ -122,7 +137,37 @@ namespace delib.calculate
 
         public static Calculator GetClassAsCalculator(this System.Object obj, params object[] args)
         {
-            return CalcHelper.ConvertClassToCalculator(obj.GetType(),args);
+            Calculator classContextCalc = new Calculator(args);
+
+
+
+            foreach (FieldInfo fi in obj.GetType().GetFields(Library.AllClassVariablesBindingFlag))
+            {
+
+                if (fi.FieldType == typeof(Constant))
+                {
+                    Constant val = fi.GetValue(obj) as Constant;
+                    classContextCalc.AddVariableToMemory(fi.Name, val);
+                }
+                else if (fi.FieldType == typeof(float))
+                {
+                    float val = (float)fi.GetValue(obj);
+                    classContextCalc.AddVariableToMemory(fi.Name, val);
+                }
+                else if (fi.FieldType == typeof(Integer))
+                {
+                    Integer val = fi.GetValue(obj) as Integer;
+                    classContextCalc.AddVariableToMemory(fi.Name, val);
+                }
+                else if (fi.FieldType == typeof(int))
+                {
+                    int val = (int)fi.GetValue(obj);
+                    classContextCalc.AddVariableToMemory(fi.Name, val);
+                }
+
+            }
+
+            return classContextCalc;
         }
     }
 

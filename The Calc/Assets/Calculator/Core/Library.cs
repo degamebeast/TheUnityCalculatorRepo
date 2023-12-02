@@ -128,7 +128,7 @@ namespace delib.calculate
                     TokenTypeValue.Constant,
                     TokenTypeValue.Integer,
                     TokenTypeValue.Variable,
-                    TokenTypeValue.Identifier,
+                    //TokenTypeValue.Identifier,
                     TokenTypeValue.Argument,
                     TokenTypeValue.Expression,
                     TokenTypeValue.Parameters
