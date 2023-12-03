@@ -128,9 +128,11 @@ namespace delib.calculate.unity
                 {
                     Color col = CalcUnityHelper.TokenInspectorColor[toke.Type];
                     string tokeText = toke.ToString();
+
+
                     //removes any differences between what has been typed and what is being presented to the user
                     //NOTE: this for loop is wildly unsafe, will eventually need to improve
-/*                    for(int i = 0; i < tokeText.Length;)
+                    for (int i = 0; i < tokeText.Length;)
                     {
                         if (valHolder[textIndex] != tokeText[i])
                         {
@@ -139,12 +141,18 @@ namespace delib.calculate.unity
                         }
                         i++;
                         textIndex++;
-                    }*/
+                    }
 
                     if (toke.Type == TokenTypeValue.Invalid)
+                    {
                         labelText += $"<color=\"#{ColorUtility.ToHtmlStringRGBA(col)}\">_</color>";
+                        textIndex++;
+                    }
                     else if (toke.Type == TokenTypeValue.Ignore)
+                    {
                         labelText += " ";
+                        textIndex++;
+                    }
                     else
                         labelText += $"<color=\"#{ColorUtility.ToHtmlStringRGBA(col)}\">{tokeText}</color>";
 
