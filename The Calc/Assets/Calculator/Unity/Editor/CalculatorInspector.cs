@@ -3,6 +3,8 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace delib.calculate.unity
 {
@@ -13,10 +15,92 @@ namespace delib.calculate.unity
     }
 
     //PropertyDrawer for drawing the ExpressionField GUI
-    [CustomPropertyDrawer(typeof(ExpressionFieldBase),true)]
+    [CustomPropertyDrawer(typeof(ExpressionFieldBase), true)]
     public class ExpressionFieldBaseDrawer : PropertyDrawer
     {
+        public Rect DrawClassDef(Rect position, SerializedProperty argInfo, System.Type argType, string argName, int indentLevel)
+        {
+            float standardSpacing = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+            SerializedProperty argToggleBool = argInfo.FindPropertyRelative("inspectorToggle");
+            SerializedProperty argFieldsArray = argInfo.FindPropertyRelative("fields");
+            SerializedProperty argFieldsHeightFloat = argInfo.FindPropertyRelative("fieldsHeight");
 
+            var indent = EditorGUI.indentLevel;
+            EditorGUI.indentLevel = indentLevel;
+
+
+
+            ClassFieldInfoHolder argInfoHold = (ClassFieldInfoHolder)argInfo.boxedValue;
+            argInfoHold.type = argType;
+            argToggleBool.boolValue = EditorGUI.Foldout(position, argToggleBool.boolValue, $"{argName} |\tType: {argInfoHold.type.Name}", true);
+            ClassPathInfo[] argObjectPath = null;
+            ClassPathInfo argArray = argFieldsArray.serializedObject.targetObject.FindObjectFromPath(argFieldsArray.propertyPath, out argObjectPath);
+            //if (argObjectPath.Length > 0)
+
+            object argArrayContainer = argObjectPath[argObjectPath.Length - 1].classObj;
+            FieldInfo argArrayFI = argArrayContainer.GetType().GetField(argArray.fieldNameInContainer);
+
+            if (argToggleBool.boolValue)
+            {
+                if (indentLevel > 8)
+                {
+                    Debug.LogWarning("Unity internal Serialization limit reached. You will not be able to delve deeper");
+                    argToggleBool.boolValue = false;
+                    return position;
+                }
+                //EditorGUI.indentLevel = indentLevel+1;
+
+
+
+                //if (argObjectPath.Length > 0)
+                {
+                    List<ClassFieldInfoHolder> argFieldsList = new List<ClassFieldInfoHolder>();
+                    FieldInfo[] argInfos = argInfoHold.type.GetFields();
+                    argFieldsHeightFloat.floatValue = standardSpacing * argInfos.Length;
+                    foreach (FieldInfo fi in argInfos)
+                    {
+                        ClassFieldInfoHolder field = new ClassFieldInfoHolder();
+                        field.type = fi.FieldType;
+                        field.fieldName = fi.Name;
+                        argFieldsList.Add(field);
+                    }
+
+                    ClassFieldInfoHolder[] curArray = (ClassFieldInfoHolder[])argArrayFI.GetValue(argArrayContainer);
+                    if (curArray != null && curArray.Length == argFieldsList.Count)
+                    {
+                        for (int i = 0; i < curArray.Length; i++)
+                        {
+                            argFieldsList[i].inspectorToggle = curArray[i].inspectorToggle;
+                            argFieldsList[i].fieldsHeight = curArray[i].fieldsHeight;
+                            argFieldsList[i].fields = curArray[i].fields;
+                        }
+                    }
+                    argArrayFI.SetValue(argArrayContainer, argFieldsList.ToArray());
+
+                }
+
+                ClassFieldInfoHolder[] infos = (ClassFieldInfoHolder[])argArray.classObj;
+                if (infos != null)
+                    for (int i = 0; i < infos.Length; i++)
+                    {
+                        ClassFieldInfoHolder infoHolder = infos[i];
+                        if (infoHolder.type == null) continue;
+                        position = new Rect(position.x, position.y + standardSpacing, position.width, standardSpacing);
+                        //EditorGUI.LabelField(position, infoHolder.type.Name);
+                        position = DrawClassDef(position, argFieldsArray.GetArrayElementAtIndex(i), infoHolder.type, infoHolder.fieldName, indentLevel + 1);
+
+                    }
+            }
+            else
+            {
+                argArrayFI.SetValue(argArrayContainer, null);
+            }
+
+
+            EditorGUI.indentLevel = indent;
+
+            return position;
+        }
         // Draw the property inside the given rect
         public override void OnGUI(Rect startPosition, SerializedProperty property, GUIContent label)
         {
@@ -25,7 +109,7 @@ namespace delib.calculate.unity
             float standardSpacing = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
 
             //Get access to the current properties Type information
-            System.Type propertyType = property.serializedObject.targetObject.FindObjectFromPath(property.propertyPath).GetType();//.GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
+            System.Type propertyType = property.serializedObject.targetObject.FindObjectFromPath(property.propertyPath).classObj.GetType();//.GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
             System.Type[] propertyTypeGenericTypes = propertyType.GetGenericArguments();
 
             //property's internal property variables
@@ -34,6 +118,7 @@ namespace delib.calculate.unity
             SerializedProperty validCheckBool = property.FindPropertyRelative("validCheck");
             SerializedProperty containingClassObject = property.FindPropertyRelative("containingClass");
             SerializedProperty lineHeightFloat = property.FindPropertyRelative("lineHeight");
+            SerializedProperty argInfosArray = property.FindPropertyRelative("argInfos");
             #endregion
 
             //assigning the current property position tracker to it's default value
@@ -46,7 +131,7 @@ namespace delib.calculate.unity
             Color origContentColor = GUI.contentColor;
 
             //checking the current valid status and assigning values accordingly
-            Color validColor = validCheckBool.boolValue? Color.green : Color.red;
+            Color validColor = validCheckBool.boolValue ? Color.green : Color.red;
 
             //assign the current value of containing class to the serialized target object
             //SELF NOTE: it may be worth trying to find a more effient way to do this
@@ -56,10 +141,10 @@ namespace delib.calculate.unity
             //set cur position height to standard line height since most controlls will be at this height
             curPosition.height = standardSpacing;
 
-            
+
             //SELF NOTE: Using BeginProperty / EndProperty on the parent property means that, prefab override logic works on the entire property.
             EditorGUI.BeginProperty(curPosition, label, property);
-            
+
             #region first line
             //creating an invisible label in order to get appropriate spacing without messing up UI visuals
             //SELF NOTE: I hope unity has a better way to do this!!
@@ -68,13 +153,13 @@ namespace delib.calculate.unity
 
             // Draw actual label (in this case the label is represented with an editor foldout)
             GUI.color = origColor;
-            Rect labelPosition = new Rect(curPosition.x, curPosition.y, curPosition.width-postLabelPosition.width, curPosition.height);
-            toggleBool.boolValue = EditorGUI.Foldout(labelPosition, toggleBool.boolValue, label,true);
+            Rect labelPosition = new Rect(curPosition.x, curPosition.y, curPosition.width - postLabelPosition.width, curPosition.height);
+            toggleBool.boolValue = EditorGUI.Foldout(labelPosition, toggleBool.boolValue, label, true);
 
 
             //draw validate button in the corresponding color
             GUI.backgroundColor = validColor;
-            if(GUI.Button(postLabelPosition, "Validate"))
+            if (GUI.Button(postLabelPosition, "Validate"))
             {
                 Calculator varCheckCalc = property.serializedObject.targetObject.GetClassAsCalculator(propertyTypeGenericTypes);
                 validCheckBool.boolValue = Expression.Validate(expressionString.stringValue, varCheckCalc, propertyTypeGenericTypes);
@@ -84,7 +169,6 @@ namespace delib.calculate.unity
 
 
 
-            //SELF NOTE: Don't make child fields be indented
             //storing current indentation level
             var indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
@@ -93,14 +177,17 @@ namespace delib.calculate.unity
             GUILayout.BeginVertical();
             if (toggleBool.boolValue)
             {
+                EditorGUI.indentLevel = 1;
                 Calculator propCalc = CalcHelper.ConvertClassToCalculator(propertyType);
                 //draw all generic TYpe info
                 for (int i = 0; i < propertyTypeGenericTypes.Length; i++)
                 {
                     curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, EditorGUIUtility.singleLineHeight);
-                    EditorGUI.LabelField(curPosition, $"arg{i} |\tType: {propertyTypeGenericTypes[i].Name}");
+                    SerializedProperty argInfo = argInfosArray.GetArrayElementAtIndex(i);
+                    curPosition = DrawClassDef(curPosition, argInfo, propertyTypeGenericTypes[i], $"arg{i}", 1);
                 }
 
+                EditorGUI.indentLevel = 0;
 
                 //create textArea style
                 Font font = Resources.Load<FontAsset>("ExpressionFieldTextAreaFont").sourceFontFile;
@@ -112,11 +199,11 @@ namespace delib.calculate.unity
                 int linesNeeded = (int)(CalcUnityHelper.GetTextWidth(expressionString.stringValue, font, textAreaStyle.fontSize) / startPosition.width) + 2;
                 lineHeightFloat.floatValue = linesNeeded * standardSpacing;
                 curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, lineHeightFloat.floatValue);
-                string valHolder = EditorGUI.TextArea(curPosition, expressionString.stringValue,textAreaStyle);
-                
+                string valHolder = EditorGUI.TextArea(curPosition, expressionString.stringValue, textAreaStyle);
+
                 //create label directly over textArea to display text with coloring
                 GUI.backgroundColor = new Color(0, 0, 0, 0);
-                Expression labelExpress = new Expression(valHolder,false);
+                Expression labelExpress = new Expression(valHolder, false);
                 propCalc.ResolveIdentifiers(labelExpress);
                 labelExpress.AddNullCaps();
                 Expression.CondenseDots(labelExpress);
@@ -198,6 +285,7 @@ namespace delib.calculate.unity
             SerializedProperty validCheckBool = property.FindPropertyRelative("validCheck");
             SerializedProperty containingClassObject = property.FindPropertyRelative("containingClass");
             SerializedProperty lineHeightFloat = property.FindPropertyRelative("lineHeight");
+            SerializedProperty argInfosArray = property.FindPropertyRelative("argInfos");
             #endregion
 
             float standardHeight = base.GetPropertyHeight(property, label);
@@ -209,8 +297,18 @@ namespace delib.calculate.unity
                 if (propertyType.IsGenericType)
                 {
                     int arraySize = propertyTypeGenericTypes.Length;
+
+                    float fieldHeightNeeded = 0;
+                    for (int i = 0; i < arraySize; i++)
+                    {
+                        SerializedProperty argInfo = argInfosArray.GetArrayElementAtIndex(i);
+                        ClassFieldInfoHolder info = (ClassFieldInfoHolder)argInfo.boxedValue;
+
+                        fieldHeightNeeded += info.GetTotalHeight();
+                    }
+
                     if (arraySize == 0) arraySize = 1;
-                    return standardHeight + (arraySize * standardSpacing) + lineHeightFloat.floatValue;
+                    return standardHeight + (arraySize * standardSpacing) + lineHeightFloat.floatValue + fieldHeightNeeded;
                 }
 
                 return standardHeight + standardSpacing + lineHeightFloat.floatValue;

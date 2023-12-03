@@ -238,7 +238,7 @@ namespace delib.calculate
 
                 if (argNum >= node.subTree.argumentTypes.Length) return false;
 
-                return node.subTree.argumentTypes[argNum].FieldPathIsValid(remainingPath);
+                return node.subTree.argumentTypes[argNum].FieldPathIsConstantNumber(remainingPath);
             }
 
 

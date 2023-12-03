@@ -1038,18 +1038,26 @@ MonoBehaviour:
     inspectorToggle: 1
     validCheck: 1
     lineHeight: 40
+    argInfos:
+    - inspectorToggle: 1
+      fieldsHeight: 40
+      fieldName: 
+      fields:
+      - inspectorToggle: 0
+        fieldsHeight: 40
+        fieldName: Instance
+        fields: []
+      - inspectorToggle: 0
+        fieldsHeight: 0
+        fieldName: testIt
+        fields: []
     containingClass: {fileID: 1058662490}
     expression: 
   field2:
     inspectorToggle: 0
     validCheck: 1
     lineHeight: 40
-    containingClass: {fileID: 1058662490}
-    expression: 
-  field3:
-    inspectorToggle: 0
-    validCheck: 1
-    lineHeight: 40
+    argInfos: []
     containingClass: {fileID: 1058662490}
     expression: 
   VariableMemoryViewContent: {fileID: 1720167673}

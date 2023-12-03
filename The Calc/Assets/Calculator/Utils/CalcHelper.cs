@@ -75,27 +75,57 @@ namespace delib.calculate
         }
     }
 
+    public class ClassPathInfo
+    {
+        public object classObj;
+        public string fieldNameInContainer;
+
+        public ClassPathInfo()
+        {
+            classObj = null;
+            fieldNameInContainer = null;
+        }
+        public ClassPathInfo(object obj, string name)
+        {
+            classObj = obj;
+            fieldNameInContainer = name;
+        }
+    }
     public static class CalculatorExtensionMethods
     {
         //returns the type of the field located at the end of path or 'null' if path does not exist
-        public static object FindObjectFromPath(this object obj, string path)
+        public static ClassPathInfo FindObjectFromPath(this object obj, string path) 
         {
+
+            ClassPathInfo[] discard;
+            return FindObjectFromPath(obj,path, out discard); 
+        }
+        public static ClassPathInfo FindObjectFromPath(this object obj, string path, out ClassPathInfo[] objPathObjects)
+        {
+            List<ClassPathInfo> fullObjectPathObjects = new List<ClassPathInfo>();
+            objPathObjects = null;
             string[] objPath = path.Split('.');
 
             object curObj = obj;
             System.Type curType = curObj.GetType();
-
+            string curPath = null;
             for (int objIndex = 0; objIndex < objPath.Length; objIndex++)
             {
-                string curPath = objPath[objIndex];
+                fullObjectPathObjects.Add(new ClassPathInfo(curObj, curPath));
+                curPath = objPath[objIndex];
 
-                if (curPath == "Array")
+                if (curPath == "Array")//detects an array/list
                 {
                     curPath = "_items";
                 }
 
                 if (curType.IsArray)
                 {
+                    if (curPath == "_items")//in case where the item is an actual arry we discard the "_item" token
+                    {
+                        objIndex++;
+                        curPath = objPath[objIndex];
+                    }
                     int arrayIndex = int.Parse(curPath.Substring(curPath.IndexOf('[') + 1, 1));
                     curObj = ((object[])curObj)[arrayIndex];
                     curType = curObj.GetType();
@@ -105,10 +135,14 @@ namespace delib.calculate
                 if (curFieldInfo == null)
                     return null;
                 curObj = curFieldInfo.GetValue(curObj);
-                curType = curObj.GetType();
+                if (curObj == null)//in case the final property in our path is a nullable type and is currently null
+                    curType = null;
+                else
+                    curType = curObj.GetType();
             }
 
-            return curObj;
+            objPathObjects = fullObjectPathObjects.ToArray();
+            return new ClassPathInfo(curObj, curPath);
         }
 
         //returns the type of the field located at the end of path or 'null' if path does not exist
@@ -129,6 +163,16 @@ namespace delib.calculate
 
             return curType;
         }
+
+        //returns true if the path exists and ends in a valid constant number type, false otherwise
+        public static bool FieldPathIsConstantNumber(this System.Type type, string path)
+        {
+            System.Type t = type.FindTypeFromPath(path);
+            if (t == null)
+                return false;
+            return Library.CaclulatorConstantTypes.Contains(t);
+        }
+
         //returns true if the path exists and false otherwise
         public static bool FieldPathIsValid(this System.Type type, string path)
         {
