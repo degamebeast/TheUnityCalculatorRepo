@@ -14,7 +14,7 @@ namespace delib.calculate.unity
 
         public string fieldName = null;
         public System.Type type = null;
-        public ClassFieldInfoHolder[] fields = null;
+        [SerializeReference]public ClassFieldInfoHolder[] fields = null;
 
         public float GetTotalHeight()
         {
@@ -40,7 +40,7 @@ namespace delib.calculate.unity
     #region ExpressionField's
     //This class represents all of the core data needed for an ExpressionField including it's UnityEditor tracking variables
     //Note: all children of ExpressionFieldBase should be made serializeable [System.Serializable] 
-    public abstract class ExpressionFieldBase// : ISerializationCallbackReceiver
+    public abstract class ExpressionFieldBase : ISerializationCallbackReceiver
     {
         #region inspector control variables
         //control for whether the inspector field should be collapsed or not
@@ -49,7 +49,7 @@ namespace delib.calculate.unity
         [SerializeField] private bool validCheck = true;
         //the height of the expression textArea factoring in the current inspector width
         [SerializeField] private float lineHeight = 0;
-        [SerializeField] protected ClassFieldInfoHolder[] argInfos = null;
+        [SerializeReference] protected ClassFieldInfoHolder[] argInfos = null;
         #endregion
         //The class that this ExpressionField belongs to
         [SerializeField] protected UnityEngine.Object containingClass = null;//This variable is set through the inspector but, still has purpose in the class instance
@@ -67,7 +67,7 @@ namespace delib.calculate.unity
             }
         }
 
-/*        public virtual void OnBeforeSerialize()
+        public virtual void OnBeforeSerialize()
         {
 
         }
@@ -75,7 +75,7 @@ namespace delib.calculate.unity
         public virtual void OnAfterDeserialize()
         {
 
-        }*/
+        }
     }
 
     //a non-generic ExpressionField
@@ -114,16 +114,21 @@ namespace delib.calculate.unity
             return classContextCalc.Calculate(expression, param1);
         }
 
-/*        public override void OnBeforeSerialize()
+        public override void OnBeforeSerialize()
         {
+            if(argInfos == null)
+                argInfos = new ClassFieldInfoHolder[1];
+            if (argInfos[0] == null)
+                argInfos[0] = new ClassFieldInfoHolder();
+
             argInfos[0].type = this.GetType().GenericTypeArguments[0];
         }
 
         public override void OnAfterDeserialize()
         {
-            argInfos[0].type = this.GetType().GenericTypeArguments[0];
+            //argInfos[0].type = this.GetType().GenericTypeArguments[0];
 
-        }*/
+        }
     }
 
     //a generic ExpressionField that takes 2 argument

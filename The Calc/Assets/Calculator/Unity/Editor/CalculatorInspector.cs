@@ -18,34 +18,34 @@ namespace delib.calculate.unity
     [CustomPropertyDrawer(typeof(ExpressionFieldBase), true)]
     public class ExpressionFieldBaseDrawer : PropertyDrawer
     {
-        public Rect DrawClassDef(Rect position, SerializedProperty argInfo, System.Type argType, string argName, int indentLevel)
+        public Rect DrawClassDef(Rect position, ClassFieldInfoHolder argInfo, System.Type argType, string argName, int indentLevel)
         {
             float standardSpacing = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
-            SerializedProperty argToggleBool = argInfo.FindPropertyRelative("inspectorToggle");
+/*            SerializedProperty argToggleBool = argInfo.FindPropertyRelative("inspectorToggle");
             SerializedProperty argFieldsArray = argInfo.FindPropertyRelative("fields");
-            SerializedProperty argFieldsHeightFloat = argInfo.FindPropertyRelative("fieldsHeight");
+            SerializedProperty argFieldsHeightFloat = argInfo.FindPropertyRelative("fieldsHeight");*/
 
             var indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = indentLevel;
 
 
 
-            ClassFieldInfoHolder argInfoHold = (ClassFieldInfoHolder)argInfo.boxedValue;
-            argInfoHold.type = argType;
-            argToggleBool.boolValue = EditorGUI.Foldout(position, argToggleBool.boolValue, $"{argName} |\tType: {argInfoHold.type.Name}", true);
-            ClassPathInfo[] argObjectPath = null;
-            ClassPathInfo argArray = argFieldsArray.serializedObject.targetObject.FindObjectFromPath(argFieldsArray.propertyPath, out argObjectPath);
+            //ClassFieldInfoHolder argInfoHold = (ClassFieldInfoHolder)argInfo.boxedValue;
+            argInfo.type = argType;
+            argInfo.inspectorToggle = EditorGUI.Foldout(position, argInfo.inspectorToggle, $"{argName} |\tType: {argInfo.type.Name}", true);
+/*            ClassPathInfo[] argObjectPath = null;
+            ClassPathInfo argArray = argFieldsArray.serializedObject.targetObject.FindObjectFromPath(argFieldsArray.propertyPath, out argObjectPath);*/
             //if (argObjectPath.Length > 0)
 
-            object argArrayContainer = argObjectPath[argObjectPath.Length - 1].classObj;
-            FieldInfo argArrayFI = argArrayContainer.GetType().GetField(argArray.fieldNameInContainer);
+/*            object argArrayContainer = argObjectPath[argObjectPath.Length - 1].classObj;
+            FieldInfo argArrayFI = argArrayContainer.GetType().GetField(argArray.fieldNameInContainer);*/
 
-            if (argToggleBool.boolValue)
+            if (argInfo.inspectorToggle)
             {
                 if (indentLevel > 8)
                 {
                     Debug.LogWarning("Unity internal Serialization limit reached. You will not be able to delve deeper");
-                    argToggleBool.boolValue = false;
+                    argInfo.inspectorToggle = false;
                     return position;
                 }
                 //EditorGUI.indentLevel = indentLevel+1;
@@ -55,8 +55,8 @@ namespace delib.calculate.unity
                 //if (argObjectPath.Length > 0)
                 {
                     List<ClassFieldInfoHolder> argFieldsList = new List<ClassFieldInfoHolder>();
-                    FieldInfo[] argInfos = argInfoHold.type.GetFields();
-                    argFieldsHeightFloat.floatValue = standardSpacing * argInfos.Length;
+                    FieldInfo[] argInfos = argInfo.type.GetFields();
+                    argInfo.fieldsHeight = standardSpacing * argInfos.Length;
                     foreach (FieldInfo fi in argInfos)
                     {
                         ClassFieldInfoHolder field = new ClassFieldInfoHolder();
@@ -65,7 +65,7 @@ namespace delib.calculate.unity
                         argFieldsList.Add(field);
                     }
 
-                    ClassFieldInfoHolder[] curArray = (ClassFieldInfoHolder[])argArrayFI.GetValue(argArrayContainer);
+                    ClassFieldInfoHolder[] curArray = argInfo.fields; //(ClassFieldInfoHolder[])argArrayFI.GetValue(argArrayContainer);
                     if (curArray != null && curArray.Length == argFieldsList.Count)
                     {
                         for (int i = 0; i < curArray.Length; i++)
@@ -75,11 +75,13 @@ namespace delib.calculate.unity
                             argFieldsList[i].fields = curArray[i].fields;
                         }
                     }
-                    argArrayFI.SetValue(argArrayContainer, argFieldsList.ToArray());
+                    //argArrayFI.SetValue(argArrayContainer, argFieldsList.ToArray());
+                    argInfo.fields = argFieldsList.ToArray();
 
                 }
 
-                ClassFieldInfoHolder[] infos = (ClassFieldInfoHolder[])argArray.classObj;
+                //ClassFieldInfoHolder[] infos = (ClassFieldInfoHolder[])argArray.classObj;
+                ClassFieldInfoHolder[] infos = argInfo.fields; //(ClassFieldInfoHolder[])argArray.classObj;
                 if (infos != null)
                     for (int i = 0; i < infos.Length; i++)
                     {
@@ -87,13 +89,14 @@ namespace delib.calculate.unity
                         if (infoHolder.type == null) continue;
                         position = new Rect(position.x, position.y + standardSpacing, position.width, standardSpacing);
                         //EditorGUI.LabelField(position, infoHolder.type.Name);
-                        position = DrawClassDef(position, argFieldsArray.GetArrayElementAtIndex(i), infoHolder.type, infoHolder.fieldName, indentLevel + 1);
+                        position = DrawClassDef(position, argInfo.fields[i], infoHolder.type, infoHolder.fieldName, indentLevel + 1);
 
                     }
             }
             else
             {
-                argArrayFI.SetValue(argArrayContainer, null);
+                //argArrayFI.SetValue(argArrayContainer, null);
+                argInfo.fields = null;
             }
 
 
@@ -118,7 +121,7 @@ namespace delib.calculate.unity
             SerializedProperty validCheckBool = property.FindPropertyRelative("validCheck");
             SerializedProperty containingClassObject = property.FindPropertyRelative("containingClass");
             SerializedProperty lineHeightFloat = property.FindPropertyRelative("lineHeight");
-            SerializedProperty argInfosArray = property.FindPropertyRelative("argInfos");
+            SerializedProperty argInfosRefArray = property.FindPropertyRelative("argInfos");
             #endregion
 
             //assigning the current property position tracker to it's default value
@@ -183,8 +186,9 @@ namespace delib.calculate.unity
                 for (int i = 0; i < propertyTypeGenericTypes.Length; i++)
                 {
                     curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, EditorGUIUtility.singleLineHeight);
-                    SerializedProperty argInfo = argInfosArray.GetArrayElementAtIndex(i);
-                    curPosition = DrawClassDef(curPosition, argInfo, propertyTypeGenericTypes[i], $"arg{i}", 1);
+                    SerializedProperty argInfo = argInfosRefArray.GetArrayElementAtIndex(i);
+                    ClassFieldInfoHolder info = (ClassFieldInfoHolder)argInfo.managedReferenceValue;
+                    curPosition = DrawClassDef(curPosition, info, propertyTypeGenericTypes[i], $"arg{i}", 1);
                 }
 
                 EditorGUI.indentLevel = 0;
@@ -285,7 +289,7 @@ namespace delib.calculate.unity
             SerializedProperty validCheckBool = property.FindPropertyRelative("validCheck");
             SerializedProperty containingClassObject = property.FindPropertyRelative("containingClass");
             SerializedProperty lineHeightFloat = property.FindPropertyRelative("lineHeight");
-            SerializedProperty argInfosArray = property.FindPropertyRelative("argInfos");
+            SerializedProperty argInfosRefArray = property.FindPropertyRelative("argInfos");
             #endregion
 
             float standardHeight = base.GetPropertyHeight(property, label);
@@ -301,8 +305,9 @@ namespace delib.calculate.unity
                     float fieldHeightNeeded = 0;
                     for (int i = 0; i < arraySize; i++)
                     {
-                        SerializedProperty argInfo = argInfosArray.GetArrayElementAtIndex(i);
-                        ClassFieldInfoHolder info = (ClassFieldInfoHolder)argInfo.boxedValue;
+                        SerializedProperty argInfo = argInfosRefArray.GetArrayElementAtIndex(i);
+                        ClassFieldInfoHolder info = (ClassFieldInfoHolder)argInfo.managedReferenceValue;
+                        if (info == null) continue;
 
                         fieldHeightNeeded += info.GetTotalHeight();
                     }

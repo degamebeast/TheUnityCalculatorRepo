@@ -1039,18 +1039,7 @@ MonoBehaviour:
     validCheck: 1
     lineHeight: 40
     argInfos:
-    - inspectorToggle: 1
-      fieldsHeight: 40
-      fieldName: 
-      fields:
-      - inspectorToggle: 0
-        fieldsHeight: 40
-        fieldName: Instance
-        fields: []
-      - inspectorToggle: 0
-        fieldsHeight: 0
-        fieldName: testIt
-        fields: []
+    - rid: 6605158970466763699
     containingClass: {fileID: 1058662490}
     expression: 
   field2:
@@ -1061,6 +1050,32 @@ MonoBehaviour:
     containingClass: {fileID: 1058662490}
     expression: 
   VariableMemoryViewContent: {fileID: 1720167673}
+  references:
+    version: 2
+    RefIds:
+    - rid: 6605158970466763699
+      type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
+      data:
+        inspectorToggle: 1
+        fieldsHeight: 40
+        fieldName: 
+        fields:
+        - rid: 6605158979239674866
+        - rid: 6605158979239674867
+    - rid: 6605158979239674866
+      type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
+      data:
+        inspectorToggle: 0
+        fieldsHeight: 40
+        fieldName: Instance
+        fields: []
+    - rid: 6605158979239674867
+      type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
+      data:
+        inspectorToggle: 0
+        fieldsHeight: 0
+        fieldName: testIt
+        fields: []
 --- !u!1 &1256280177
 GameObject:
   m_ObjectHideFlags: 0
