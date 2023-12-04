@@ -1043,7 +1043,7 @@ MonoBehaviour:
     containingClass: {fileID: 1058662490}
     expression: 
   field2:
-    inspectorToggle: 0
+    inspectorToggle: 1
     validCheck: 1
     lineHeight: 40
     argInfos: []
@@ -1089,7 +1089,7 @@ MonoBehaviour:
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
         inspectorToggle: 0
-        fieldsHeight: 0
+        fieldsHeight: 40
         fieldName: 
         fields: []
     - rid: 6605158979654909955

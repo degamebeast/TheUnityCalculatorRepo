@@ -103,7 +103,7 @@ namespace delib.calculate.unity
     {
         public ExpressionField()
         {
-            argInfos = new ClassFieldInfoHolder[1];
+            //argInfos = new ClassFieldInfoHolder[1];
         }
 
         //Returnd the result of callinf Calculate() on the stored 'expression' variable within the scope of the 'containingClass'

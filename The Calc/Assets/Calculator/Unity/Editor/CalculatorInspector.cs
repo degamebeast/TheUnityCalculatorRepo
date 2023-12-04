@@ -33,13 +33,14 @@ namespace delib.calculate.unity
             //ClassFieldInfoHolder argInfoHold = (ClassFieldInfoHolder)argInfo.boxedValue;
             argInfo.type = argType;
             argInfo.inspectorToggle = EditorGUI.Foldout(position, argInfo.inspectorToggle, $"{argName} |\tType: {argInfo.type.Name}", true);
-/*            ClassPathInfo[] argObjectPath = null;
-            ClassPathInfo argArray = argFieldsArray.serializedObject.targetObject.FindObjectFromPath(argFieldsArray.propertyPath, out argObjectPath);*/
+            /*            ClassPathInfo[] argObjectPath = null;
+                        ClassPathInfo argArray = argFieldsArray.serializedObject.targetObject.FindObjectFromPath(argFieldsArray.propertyPath, out argObjectPath);*/
             //if (argObjectPath.Length > 0)
 
-/*            object argArrayContainer = argObjectPath[argObjectPath.Length - 1].classObj;
-            FieldInfo argArrayFI = argArrayContainer.GetType().GetField(argArray.fieldNameInContainer);*/
+            /*            object argArrayContainer = argObjectPath[argObjectPath.Length - 1].classObj;
+                        FieldInfo argArrayFI = argArrayContainer.GetType().GetField(argArray.fieldNameInContainer);*/
 
+            //Debug.Log(argInfo.inspectorToggle);
             if (argInfo.inspectorToggle)
             {
                 if (indentLevel > 8)
@@ -201,7 +202,9 @@ namespace delib.calculate.unity
 
                 //create textArea for user input
                 int linesNeeded = (int)(CalcUnityHelper.GetTextWidth(expressionString.stringValue, font, textAreaStyle.fontSize) / startPosition.width) + 2;
-                lineHeightFloat.floatValue = linesNeeded * standardSpacing;
+                //int linesNeeded = (int)(100 / startPosition.width) + 2;
+                if (Event.current.type == EventType.Repaint)
+                    lineHeightFloat.floatValue = linesNeeded * standardSpacing;
                 curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, lineHeightFloat.floatValue);
                 string valHolder = EditorGUI.TextArea(curPosition, expressionString.stringValue, textAreaStyle);
 
