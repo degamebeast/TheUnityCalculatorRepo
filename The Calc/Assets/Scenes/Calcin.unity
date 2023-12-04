@@ -1035,7 +1035,7 @@ MonoBehaviour:
   outputText: {fileID: 1017346224}
   textPreFab: {fileID: 7717357080427439117, guid: 3d4bfcfc215d15c4cb64f6b83875bc6e, type: 3}
   field:
-    inspectorToggle: 1
+    inspectorToggle: 0
     validCheck: 1
     lineHeight: 40
     argInfos:
@@ -1049,6 +1049,17 @@ MonoBehaviour:
     argInfos: []
     containingClass: {fileID: 1058662490}
     expression: 
+  field3:
+    inspectorToggle: 0
+    validCheck: 1
+    lineHeight: 40
+    argInfos:
+    - rid: 6605158979654909952
+    - rid: 6605158979654909953
+    - rid: 6605158979654909954
+    - rid: 6605158979654909955
+    containingClass: {fileID: 1058662490}
+    expression: 
   VariableMemoryViewContent: {fileID: 1720167673}
   references:
     version: 2
@@ -1056,25 +1067,37 @@ MonoBehaviour:
     - rid: 6605158970466763699
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
-        inspectorToggle: 1
+        inspectorToggle: 0
         fieldsHeight: 40
         fieldName: 
-        fields:
-        - rid: 6605158979239674866
-        - rid: 6605158979239674867
-    - rid: 6605158979239674866
+        fields: []
+    - rid: 6605158979654909952
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
         inspectorToggle: 0
         fieldsHeight: 40
-        fieldName: Instance
+        fieldName: 
         fields: []
-    - rid: 6605158979239674867
+    - rid: 6605158979654909953
+      type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
+      data:
+        inspectorToggle: 0
+        fieldsHeight: 40
+        fieldName: 
+        fields: []
+    - rid: 6605158979654909954
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
         inspectorToggle: 0
         fieldsHeight: 0
-        fieldName: testIt
+        fieldName: 
+        fields: []
+    - rid: 6605158979654909955
+      type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
+      data:
+        inspectorToggle: 0
+        fieldsHeight: 140
+        fieldName: 
         fields: []
 --- !u!1 &1256280177
 GameObject:
