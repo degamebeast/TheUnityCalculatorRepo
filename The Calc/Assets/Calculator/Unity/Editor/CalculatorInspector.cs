@@ -57,12 +57,21 @@ namespace delib.calculate.unity
                 {
                     List<ClassFieldInfoHolder> argFieldsList = new List<ClassFieldInfoHolder>();
                     FieldInfo[] argInfos = argInfo.type.GetFields();
-                    argInfo.fieldsHeight = standardSpacing * argInfos.Length;
+                    PropertyInfo[] argPropInfos = argInfo.type.GetProperties();
+                    argInfo.fieldsHeight = standardSpacing * (argInfos.Length + argPropInfos.Length);
                     foreach (FieldInfo fi in argInfos)
                     {
                         ClassFieldInfoHolder field = new ClassFieldInfoHolder();
                         field.type = fi.FieldType;
                         field.fieldName = fi.Name;
+                        argFieldsList.Add(field);
+                    }
+
+                    foreach (PropertyInfo pi in argPropInfos)
+                    {
+                        ClassFieldInfoHolder field = new ClassFieldInfoHolder();
+                        field.type = pi.PropertyType;
+                        field.fieldName = pi.Name;
                         argFieldsList.Add(field);
                     }
 

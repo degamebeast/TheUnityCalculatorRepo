@@ -1035,15 +1035,15 @@ MonoBehaviour:
   outputText: {fileID: 1017346224}
   textPreFab: {fileID: 7717357080427439117, guid: 3d4bfcfc215d15c4cb64f6b83875bc6e, type: 3}
   field:
-    inspectorToggle: 0
+    inspectorToggle: 1
     validCheck: 1
     lineHeight: 40
     argInfos:
     - rid: 6605158970466763699
     containingClass: {fileID: 1058662490}
-    expression: 
+    expression: arg0.testItProp
   field2:
-    inspectorToggle: 1
+    inspectorToggle: 0
     validCheck: 1
     lineHeight: 40
     argInfos: []
@@ -1067,10 +1067,13 @@ MonoBehaviour:
     - rid: 6605158970466763699
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
-        inspectorToggle: 0
-        fieldsHeight: 40
+        inspectorToggle: 1
+        fieldsHeight: 60
         fieldName: 
-        fields: []
+        fields:
+        - rid: 6605158983658636015
+        - rid: 6605158983658636016
+        - rid: 6605158983658636017
     - rid: 6605158979654909952
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
@@ -1098,6 +1101,27 @@ MonoBehaviour:
         inspectorToggle: 0
         fieldsHeight: 140
         fieldName: 
+        fields: []
+    - rid: 6605158983658636015
+      type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
+      data:
+        inspectorToggle: 0
+        fieldsHeight: 0
+        fieldName: Instance
+        fields: []
+    - rid: 6605158983658636016
+      type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
+      data:
+        inspectorToggle: 0
+        fieldsHeight: 40
+        fieldName: testIt
+        fields: []
+    - rid: 6605158983658636017
+      type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
+      data:
+        inspectorToggle: 0
+        fieldsHeight: 40
+        fieldName: testItProp
         fields: []
 --- !u!1 &1256280177
 GameObject:

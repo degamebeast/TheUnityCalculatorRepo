@@ -3,6 +3,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEditor.UIElements;
 
 
 namespace delib.calculate
@@ -146,6 +147,7 @@ namespace delib.calculate
         }
 
         //returns the type of the field located at the end of path or 'null' if path does not exist
+        //NOTE: works for fields and properties
         public static System.Type FindTypeFromPath(this System.Type type, string path)
         {
             string[] argPath = path.Split('.');
@@ -156,6 +158,14 @@ namespace delib.calculate
             for (int argIndex = 0; argIndex < argPath.Length; argIndex++)
             {
                 FieldInfo curFieldInfo = curType.GetField($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
+                PropertyInfo curPropertyInfo = curType.GetProperty($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
+
+                if (curPropertyInfo != null)
+                {
+                    curType = curPropertyInfo.PropertyType;
+                    continue;
+                }
+
                 if (curFieldInfo == null)
                     return null;
                 curType = curFieldInfo.FieldType;
@@ -165,6 +175,7 @@ namespace delib.calculate
         }
 
         //returns true if the path exists and ends in a valid constant number type, false otherwise
+        //NOTE: works for fields and properties
         public static bool FieldPathIsConstantNumber(this System.Type type, string path)
         {
             System.Type t = type.FindTypeFromPath(path);
@@ -174,6 +185,7 @@ namespace delib.calculate
         }
 
         //returns true if the path exists and false otherwise
+        //NOTE: works for fields and properties
         public static bool FieldPathIsValid(this System.Type type, string path)
         {
             return type.FindTypeFromPath(path) != null;

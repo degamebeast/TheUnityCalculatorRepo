@@ -189,6 +189,15 @@ namespace delib.calculate
             {
                 System.Type curType = curField.GetType();
                 FieldInfo curFieldInfo = curType.GetField($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
+                PropertyInfo curPropertyInfo = curType.GetProperty($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
+
+
+                if (curPropertyInfo != null)
+                {
+                    curField = curPropertyInfo.GetValue(curField);
+                    continue;
+                }
+
                 if (curFieldInfo == null)
                     return null;
                 curField = curFieldInfo.GetValue(curField);

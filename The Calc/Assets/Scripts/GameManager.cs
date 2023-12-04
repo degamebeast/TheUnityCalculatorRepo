@@ -12,6 +12,11 @@ public class GameManager : MonoBehaviour
         public static TestingClass Instance;
         //public ExpressionField field2 = new ExpressionField();
         public int testIt;
+        public int testItProp
+        {
+            get;
+            set;
+        }
 
         public TestingClass()
         {
@@ -53,6 +58,7 @@ public class GameManager : MonoBehaviour
         cobo = 10;
         TestingClass classs = new TestingClass();
         classs.testIt = 5;
+        classs.testItProp = 6;
 
 
         Instance = this;
