@@ -123,12 +123,6 @@ namespace delib.calculate.unity
 
             argInfos[0].type = this.GetType().GenericTypeArguments[0];
         }
-
-        public override void OnAfterDeserialize()
-        {
-            //argInfos[0].type = this.GetType().GenericTypeArguments[0];
-
-        }
     }
 
     //a generic ExpressionField that takes 2 argument
@@ -138,7 +132,7 @@ namespace delib.calculate.unity
 
         public ExpressionField()
         {
-
+            argInfos = new ClassFieldInfoHolder[2];
         }
         //Returnd the result of callinf Calculate() on the stored 'expression' variable within the scope of the 'containingClass'
         //also sends 2 additional argument into the Calculate() call
@@ -146,6 +140,19 @@ namespace delib.calculate.unity
         {
             Calculator classContextCalc = containingClass.GetClassAsCalculator();
             return classContextCalc.Calculate(expression, param1, param2);
+        }
+
+        public override void OnBeforeSerialize()
+        {
+            if (argInfos == null)
+                argInfos = new ClassFieldInfoHolder[2];
+            if (argInfos[0] == null)
+                argInfos[0] = new ClassFieldInfoHolder();
+            if (argInfos[1] == null)
+                argInfos[1] = new ClassFieldInfoHolder();
+
+            argInfos[0].type = this.GetType().GenericTypeArguments[0];
+            argInfos[0].type = this.GetType().GenericTypeArguments[1];
         }
     }
 
@@ -156,7 +163,7 @@ namespace delib.calculate.unity
 
         public ExpressionField()
         {
-
+            argInfos = new ClassFieldInfoHolder[3];
         }
         //Returnd the result of callinf Calculate() on the stored 'expression' variable within the scope of the 'containingClass'
         //also sends 3 additional argument into the Calculate() call
@@ -164,6 +171,22 @@ namespace delib.calculate.unity
         {
             Calculator classContextCalc = containingClass.GetClassAsCalculator();
             return classContextCalc.Calculate(expression, param1, param2, param3);
+        }
+
+        public override void OnBeforeSerialize()
+        {
+            if (argInfos == null)
+                argInfos = new ClassFieldInfoHolder[3];
+            if (argInfos[0] == null)
+                argInfos[0] = new ClassFieldInfoHolder();
+            if (argInfos[1] == null)
+                argInfos[1] = new ClassFieldInfoHolder();
+            if (argInfos[2] == null)
+                argInfos[2] = new ClassFieldInfoHolder();
+
+            argInfos[0].type = this.GetType().GenericTypeArguments[0];
+            argInfos[1].type = this.GetType().GenericTypeArguments[1];
+            argInfos[2].type = this.GetType().GenericTypeArguments[2];
         }
     }
 
@@ -174,6 +197,7 @@ namespace delib.calculate.unity
 
         public ExpressionField()
         {
+            argInfos = new ClassFieldInfoHolder[4];
 
         }
         //Returnd the result of callinf Calculate() on the stored 'expression' variable within the scope of the 'containingClass'
@@ -182,6 +206,25 @@ namespace delib.calculate.unity
         {
             Calculator classContextCalc = containingClass.GetClassAsCalculator();
             return classContextCalc.Calculate(expression, param1, param2, param3, param4);
+        }
+
+        public override void OnBeforeSerialize()
+        {
+            if (argInfos == null)
+                argInfos = new ClassFieldInfoHolder[4];
+            if (argInfos[0] == null)
+                argInfos[0] = new ClassFieldInfoHolder();
+            if (argInfos[1] == null)
+                argInfos[1] = new ClassFieldInfoHolder();
+            if (argInfos[2] == null)
+                argInfos[2] = new ClassFieldInfoHolder();
+            if (argInfos[3] == null)
+                argInfos[3] = new ClassFieldInfoHolder();
+
+            argInfos[0].type = this.GetType().GenericTypeArguments[0];
+            argInfos[1].type = this.GetType().GenericTypeArguments[1];
+            argInfos[2].type = this.GetType().GenericTypeArguments[2];
+            argInfos[3].type = this.GetType().GenericTypeArguments[3];
         }
     }
 
@@ -192,6 +235,7 @@ namespace delib.calculate.unity
 
         public ExpressionField()
         {
+            argInfos = new ClassFieldInfoHolder[5];
 
         }
         //Returnd the result of callinf Calculate() on the stored 'expression' variable within the scope of the 'containingClass'
@@ -200,6 +244,28 @@ namespace delib.calculate.unity
         {
             Calculator classContextCalc = containingClass.GetClassAsCalculator();
             return classContextCalc.Calculate(expression, param1, param2, param3, param4, param5);
+        }
+
+        public override void OnBeforeSerialize()
+        {
+            if (argInfos == null)
+                argInfos = new ClassFieldInfoHolder[5];
+            if (argInfos[0] == null)
+                argInfos[0] = new ClassFieldInfoHolder();
+            if (argInfos[1] == null)
+                argInfos[1] = new ClassFieldInfoHolder();
+            if (argInfos[2] == null)
+                argInfos[2] = new ClassFieldInfoHolder();
+            if (argInfos[3] == null)
+                argInfos[3] = new ClassFieldInfoHolder();
+            if (argInfos[4] == null)
+                argInfos[4] = new ClassFieldInfoHolder();
+
+            argInfos[0].type = this.GetType().GenericTypeArguments[0];
+            argInfos[1].type = this.GetType().GenericTypeArguments[1];
+            argInfos[2].type = this.GetType().GenericTypeArguments[2];
+            argInfos[3].type = this.GetType().GenericTypeArguments[3];
+            argInfos[4].type = this.GetType().GenericTypeArguments[4];
         }
     }
 
@@ -210,6 +276,7 @@ namespace delib.calculate.unity
 
         public ExpressionField()
         {
+            argInfos = new ClassFieldInfoHolder[1];
 
         }
         //Returnd the result of callinf Calculate() on the stored 'expression' variable within the scope of the 'containingClass'
@@ -218,6 +285,31 @@ namespace delib.calculate.unity
         {
             Calculator classContextCalc = containingClass.GetClassAsCalculator();
             return classContextCalc.Calculate(expression, param1, param2, param3, param4, param5, param6);
+        }
+
+        public override void OnBeforeSerialize()
+        {
+            if (argInfos == null)
+                argInfos = new ClassFieldInfoHolder[6];
+            if (argInfos[0] == null)
+                argInfos[0] = new ClassFieldInfoHolder();
+            if (argInfos[1] == null)
+                argInfos[1] = new ClassFieldInfoHolder();
+            if (argInfos[2] == null)
+                argInfos[2] = new ClassFieldInfoHolder();
+            if (argInfos[3] == null)
+                argInfos[3] = new ClassFieldInfoHolder();
+            if (argInfos[4] == null)
+                argInfos[4] = new ClassFieldInfoHolder();
+            if (argInfos[5] == null)
+                argInfos[5] = new ClassFieldInfoHolder();
+
+            argInfos[0].type = this.GetType().GenericTypeArguments[0];
+            argInfos[1].type = this.GetType().GenericTypeArguments[1];
+            argInfos[2].type = this.GetType().GenericTypeArguments[2];
+            argInfos[3].type = this.GetType().GenericTypeArguments[3];
+            argInfos[4].type = this.GetType().GenericTypeArguments[4];
+            argInfos[5].type = this.GetType().GenericTypeArguments[5];
         }
     }
 
@@ -228,6 +320,7 @@ namespace delib.calculate.unity
 
         public ExpressionField()
         {
+            argInfos = new ClassFieldInfoHolder[7];
 
         }
         //Returnd the result of callinf Calculate() on the stored 'expression' variable within the scope of the 'containingClass'
@@ -236,6 +329,35 @@ namespace delib.calculate.unity
         {
             Calculator classContextCalc = containingClass.GetClassAsCalculator();
             return classContextCalc.Calculate(expression, param1, param2, param3, param4, param5, param6, param7);
+        }
+
+        public override void OnBeforeSerialize()
+        {
+            if (argInfos == null)
+                argInfos = new ClassFieldInfoHolder[7];
+            if (argInfos[0] == null)
+                argInfos[0] = new ClassFieldInfoHolder();
+            if (argInfos[1] == null)
+                argInfos[1] = new ClassFieldInfoHolder();
+            if (argInfos[2] == null)
+                argInfos[2] = new ClassFieldInfoHolder();
+            if (argInfos[3] == null)
+                argInfos[3] = new ClassFieldInfoHolder();
+            if (argInfos[4] == null)
+                argInfos[4] = new ClassFieldInfoHolder();
+            if (argInfos[5] == null)
+                argInfos[5] = new ClassFieldInfoHolder();
+            if (argInfos[6] == null)
+                argInfos[6] = new ClassFieldInfoHolder();
+
+
+            argInfos[0].type = this.GetType().GenericTypeArguments[0];
+            argInfos[1].type = this.GetType().GenericTypeArguments[1];
+            argInfos[2].type = this.GetType().GenericTypeArguments[2];
+            argInfos[3].type = this.GetType().GenericTypeArguments[3];
+            argInfos[4].type = this.GetType().GenericTypeArguments[4];
+            argInfos[5].type = this.GetType().GenericTypeArguments[5];
+            argInfos[6].type = this.GetType().GenericTypeArguments[6];
         }
     }
 
@@ -246,7 +368,7 @@ namespace delib.calculate.unity
 
         public ExpressionField()
         {
-
+            argInfos = new ClassFieldInfoHolder[8];
         }
         //Returnd the result of callinf Calculate() on the stored 'expression' variable within the scope of the 'containingClass'
         //also sends 8 additional argument into the Calculate() call
@@ -254,6 +376,37 @@ namespace delib.calculate.unity
         {
             Calculator classContextCalc = containingClass.GetClassAsCalculator();
             return classContextCalc.Calculate(expression, param1, param2, param3, param4, param5, param6, param7, param8);
+        }
+
+        public override void OnBeforeSerialize()
+        {
+            if (argInfos == null)
+                argInfos = new ClassFieldInfoHolder[8];
+            if (argInfos[0] == null)
+                argInfos[0] = new ClassFieldInfoHolder();
+            if (argInfos[1] == null)
+                argInfos[1] = new ClassFieldInfoHolder();
+            if (argInfos[2] == null)
+                argInfos[2] = new ClassFieldInfoHolder();
+            if (argInfos[3] == null)
+                argInfos[3] = new ClassFieldInfoHolder();
+            if (argInfos[4] == null)
+                argInfos[4] = new ClassFieldInfoHolder();
+            if (argInfos[5] == null)
+                argInfos[5] = new ClassFieldInfoHolder();
+            if (argInfos[6] == null)
+                argInfos[6] = new ClassFieldInfoHolder();
+            if (argInfos[7] == null)
+                argInfos[7] = new ClassFieldInfoHolder();
+
+            argInfos[0].type = this.GetType().GenericTypeArguments[0];
+            argInfos[1].type = this.GetType().GenericTypeArguments[1];
+            argInfos[2].type = this.GetType().GenericTypeArguments[2];
+            argInfos[3].type = this.GetType().GenericTypeArguments[3];
+            argInfos[4].type = this.GetType().GenericTypeArguments[4];
+            argInfos[5].type = this.GetType().GenericTypeArguments[5];
+            argInfos[6].type = this.GetType().GenericTypeArguments[6];
+            argInfos[7].type = this.GetType().GenericTypeArguments[7];
         }
     }
 

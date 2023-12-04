@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
     public ExpressionField field2;
 
 
-    //public ExpressionField<TestingClass, TestingClass, int, GameManager> field3;
+    public ExpressionField<TestingClass, TestingClass, int, GameManager> field3;
     public GameObject VariableMemoryViewContent;
 
     private Constant test;
