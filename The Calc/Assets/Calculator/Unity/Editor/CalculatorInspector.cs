@@ -279,7 +279,7 @@ namespace delib.calculate.unity
             float standardSpacing = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
 
             //Get access to the current properties Type information
-            System.Type propertyType = property.serializedObject.targetObject.GetType().GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
+            System.Type propertyType = property.serializedObject.targetObject.FindObjectFromPath(property.propertyPath).classObj.GetType();
             System.Type[] propertyTypeGenericTypes = propertyType.GetGenericArguments();
 
 
