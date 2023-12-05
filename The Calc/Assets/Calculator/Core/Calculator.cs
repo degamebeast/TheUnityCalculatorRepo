@@ -142,7 +142,11 @@ namespace delib.calculate
             for(int i = 0; i < expr.Count; i++)
             {
                 Token cur = expr[i];
-                if(cur.Type == TokenTypeValue.Identifier)
+                if (cur.Type == TokenTypeValue.Expression)
+                {
+                    ResolveIdentifiers(cur.Expression, addVariableIfNotInMemory);
+                }
+                else if (cur.Type == TokenTypeValue.Identifier)
                 {
                     Function funct;
                     Variable var;
