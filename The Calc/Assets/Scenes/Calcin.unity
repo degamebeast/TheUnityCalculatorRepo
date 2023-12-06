@@ -1041,7 +1041,7 @@ MonoBehaviour:
     argInfos:
     - rid: 6605158970466763699
     containingClass: {fileID: 1058662490}
-    expression: arg0.testItProp
+    expression: arg0.testIt/2
   field2:
     inspectorToggle: 0
     validCheck: 1
@@ -1071,9 +1071,9 @@ MonoBehaviour:
         fieldsHeight: 60
         fieldName: 
         fields:
-        - rid: 6605158983658636015
-        - rid: 6605158983658636016
-        - rid: 6605158983658636017
+        - rid: 6605158989833438018
+        - rid: 6605158989833438019
+        - rid: 6605158989833438020
     - rid: 6605158979654909952
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
@@ -1102,25 +1102,25 @@ MonoBehaviour:
         fieldsHeight: 140
         fieldName: 
         fields: []
-    - rid: 6605158983658636015
+    - rid: 6605158989833438018
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
         inspectorToggle: 0
         fieldsHeight: 0
         fieldName: Instance
         fields: []
-    - rid: 6605158983658636016
+    - rid: 6605158989833438019
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
         inspectorToggle: 0
-        fieldsHeight: 40
+        fieldsHeight: 0
         fieldName: testIt
         fields: []
-    - rid: 6605158983658636017
+    - rid: 6605158989833438020
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
         inspectorToggle: 0
-        fieldsHeight: 40
+        fieldsHeight: 0
         fieldName: testItProp
         fields: []
 --- !u!1 &1256280177
