@@ -1,9 +1,38 @@
 //Created by: Deontae Albertie
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace delib.calculate.unity
 {
+    [System.AttributeUsage(System.AttributeTargets.Field)]
+    public class ArgumentNameAttribute : System.Attribute
+    {
+        private int num;
+        private string name;
+        public ArgumentNameAttribute(int argNum, string argName)
+        {
+            num = argNum;
+            name = argName;
+        }
+
+        public int ArgNum
+        {
+            get
+            {
+                return num;
+            }
+        }
+
+        public string ArgName
+        {
+            get
+            {
+                return name;
+            }
+        }
+    }
+
     [System.Serializable]
     public class ClassFieldInfoHolder
     {
@@ -103,7 +132,7 @@ namespace delib.calculate.unity
     {
         public ExpressionField()
         {
-            //argInfos = new ClassFieldInfoHolder[1];
+            Init();
         }
 
         //Returnd the result of callinf Calculate() on the stored 'expression' variable within the scope of the 'containingClass'
@@ -114,14 +143,19 @@ namespace delib.calculate.unity
             return classContextCalc.Calculate(expression, param1);
         }
 
-        public override void OnBeforeSerialize()
+        public void Init()
         {
-            if(argInfos == null)
+            if (argInfos == null)
                 argInfos = new ClassFieldInfoHolder[1];
             if (argInfos[0] == null)
                 argInfos[0] = new ClassFieldInfoHolder();
 
             argInfos[0].type = this.GetType().GenericTypeArguments[0];
+        }
+
+        public override void OnBeforeSerialize()
+        {
+            Init();
         }
     }
 
@@ -226,6 +260,7 @@ namespace delib.calculate.unity
             argInfos[2].type = this.GetType().GenericTypeArguments[2];
             argInfos[3].type = this.GetType().GenericTypeArguments[3];
         }
+
     }
 
     //a generic ExpressionField that takes 5 argument
@@ -267,6 +302,7 @@ namespace delib.calculate.unity
             argInfos[3].type = this.GetType().GenericTypeArguments[3];
             argInfos[4].type = this.GetType().GenericTypeArguments[4];
         }
+
     }
 
     //a generic ExpressionField that takes 6 argument
@@ -311,6 +347,7 @@ namespace delib.calculate.unity
             argInfos[4].type = this.GetType().GenericTypeArguments[4];
             argInfos[5].type = this.GetType().GenericTypeArguments[5];
         }
+
     }
 
     //a generic ExpressionField that takes 7 argument
@@ -359,6 +396,7 @@ namespace delib.calculate.unity
             argInfos[5].type = this.GetType().GenericTypeArguments[5];
             argInfos[6].type = this.GetType().GenericTypeArguments[6];
         }
+
     }
 
     //a generic ExpressionField that takes 8 argument
@@ -408,6 +446,7 @@ namespace delib.calculate.unity
             argInfos[6].type = this.GetType().GenericTypeArguments[6];
             argInfos[7].type = this.GetType().GenericTypeArguments[7];
         }
+
     }
 
     #endregion

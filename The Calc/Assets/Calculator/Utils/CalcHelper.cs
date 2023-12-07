@@ -79,16 +79,19 @@ namespace delib.calculate
     {
         public object classObj;
         public string fieldNameInContainer;
+        public System.Attribute[] attributes;
 
         public ClassPathInfo()
         {
             classObj = null;
             fieldNameInContainer = null;
+            attributes = null;
         }
-        public ClassPathInfo(object obj, string name)
+        public ClassPathInfo(object obj, string name, System.Attribute[] attrs)
         {
             classObj = obj;
             fieldNameInContainer = name;
+            attributes = attrs;
         }
     }
     public static class CalculatorExtensionMethods
@@ -108,10 +111,11 @@ namespace delib.calculate
 
             object curObj = obj;
             System.Type curType = curObj.GetType();
+            System.Attribute[] curatrs = System.Attribute.GetCustomAttributes(curObj.GetType());
             string curPath = null;
             for (int objIndex = 0; objIndex < objPath.Length; objIndex++)
             {
-                fullObjectPathObjects.Add(new ClassPathInfo(curObj, curPath));
+                fullObjectPathObjects.Add(new ClassPathInfo(curObj, curPath, curatrs));
                 curPath = objPath[objIndex];
 
                 if (curPath == "Array")//detects an array/list
@@ -136,13 +140,19 @@ namespace delib.calculate
                     return null;
                 curObj = curFieldInfo.GetValue(curObj);
                 if (curObj == null)//in case the final property in our path is a nullable type and is currently null
+                {
                     curType = null;
+                    curatrs = null;
+                }
                 else
+                {
                     curType = curObj.GetType();
+                    curatrs = System.Attribute.GetCustomAttributes(curFieldInfo);
+                }
             }
 
             objPathObjects = fullObjectPathObjects.ToArray();
-            return new ClassPathInfo(curObj, curPath);
+            return new ClassPathInfo(curObj, curPath, curatrs);
         }
 
         //returns the type of the field located at the end of path or 'null' if path does not exist

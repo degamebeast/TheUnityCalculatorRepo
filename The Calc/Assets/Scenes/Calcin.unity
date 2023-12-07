@@ -1041,7 +1041,7 @@ MonoBehaviour:
     argInfos:
     - rid: 6605158970466763699
     containingClass: {fileID: 1058662490}
-    expression: arg0.testIt/2
+    expression: arg0.testIt/7
   field2:
     inspectorToggle: 0
     validCheck: 1
@@ -1050,7 +1050,7 @@ MonoBehaviour:
     containingClass: {fileID: 1058662490}
     expression: 
   field3:
-    inspectorToggle: 0
+    inspectorToggle: 1
     validCheck: 1
     lineHeight: 40
     argInfos:
@@ -1067,13 +1067,10 @@ MonoBehaviour:
     - rid: 6605158970466763699
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
-        inspectorToggle: 1
+        inspectorToggle: 0
         fieldsHeight: 60
         fieldName: 
-        fields:
-        - rid: 6605158989833438018
-        - rid: 6605158989833438019
-        - rid: 6605158989833438020
+        fields: []
     - rid: 6605158979654909952
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
@@ -1085,7 +1082,7 @@ MonoBehaviour:
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
         inspectorToggle: 0
-        fieldsHeight: 40
+        fieldsHeight: 60
         fieldName: 
         fields: []
     - rid: 6605158979654909954
@@ -1099,29 +1096,8 @@ MonoBehaviour:
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
         inspectorToggle: 0
-        fieldsHeight: 140
+        fieldsHeight: 620
         fieldName: 
-        fields: []
-    - rid: 6605158989833438018
-      type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
-      data:
-        inspectorToggle: 0
-        fieldsHeight: 0
-        fieldName: Instance
-        fields: []
-    - rid: 6605158989833438019
-      type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
-      data:
-        inspectorToggle: 0
-        fieldsHeight: 0
-        fieldName: testIt
-        fields: []
-    - rid: 6605158989833438020
-      type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
-      data:
-        inspectorToggle: 0
-        fieldsHeight: 0
-        fieldName: testItProp
         fields: []
 --- !u!1 &1256280177
 GameObject:

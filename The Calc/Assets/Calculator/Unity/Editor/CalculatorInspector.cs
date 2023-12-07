@@ -13,7 +13,6 @@ namespace delib.calculate.unity
     {
 
     }
-
     //PropertyDrawer for drawing the ExpressionField GUI
     [CustomPropertyDrawer(typeof(ExpressionFieldBase), true)]
     public class ExpressionFieldBaseDrawer : PropertyDrawer
@@ -122,7 +121,10 @@ namespace delib.calculate.unity
             float standardSpacing = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
 
             //Get access to the current properties Type information
-            System.Type propertyType = property.serializedObject.targetObject.FindObjectFromPath(property.propertyPath).classObj.GetType();//.GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
+            ClassPathInfo propertyClassInfo = property.serializedObject.targetObject.FindObjectFromPath(property.propertyPath);
+            ExpressionFieldBase propertyObj = (ExpressionFieldBase)propertyClassInfo.classObj;//.GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
+            System.Attribute[] propertyAttributes = propertyClassInfo.attributes;
+            System.Type propertyType = propertyObj.GetType();//.GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
             System.Type[] propertyTypeGenericTypes = propertyType.GetGenericArguments();
 
             //property's internal property variables
@@ -136,7 +138,6 @@ namespace delib.calculate.unity
 
             //assigning the current property position tracker to it's default value
             Rect curPosition = startPosition;
-
 
             //storing referencs to the current GUI colors
             Color origColor = GUI.color;
@@ -192,13 +193,36 @@ namespace delib.calculate.unity
             {
                 EditorGUI.indentLevel = 1;
                 Calculator propCalc = CalcHelper.ConvertClassToCalculator(propertyType);
+                ArgumentNameAttribute[] argAttributes = new ArgumentNameAttribute[propertyTypeGenericTypes.Length];
+                string[] argNames = new string[propertyTypeGenericTypes.Length];
+
+                for(int i = 0; i < propertyTypeGenericTypes.Length; i++)
+                {
+                    argNames[i] = $"arg{i}";
+                }
+
+                foreach(System.Attribute atr in propertyClassInfo.attributes)
+                {
+                    ArgumentNameAttribute argAtr = atr as ArgumentNameAttribute;
+
+                    if (argAtr == null) continue;
+                    if (argAtr.ArgNum >= propertyTypeGenericTypes.Length) continue;
+
+
+                    argNames[argAtr.ArgNum] = argAtr.ArgName;
+                }
+
                 //draw all generic TYpe info
                 for (int i = 0; i < propertyTypeGenericTypes.Length; i++)
                 {
                     curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, EditorGUIUtility.singleLineHeight);
                     SerializedProperty argInfo = argInfosRefArray.GetArrayElementAtIndex(i);
                     ClassFieldInfoHolder info = (ClassFieldInfoHolder)argInfo.managedReferenceValue;
-                    curPosition = DrawClassDef(curPosition, info, propertyTypeGenericTypes[i], $"arg{i}", 1);
+
+
+
+
+                    curPosition = DrawClassDef(curPosition, info, propertyTypeGenericTypes[i], argNames[i], 1);
                 }
 
                 EditorGUI.indentLevel = 0;
@@ -215,7 +239,7 @@ namespace delib.calculate.unity
                 if (Event.current.type == EventType.Repaint)
                     lineHeightFloat.floatValue = linesNeeded * standardSpacing;
                 curPosition = new Rect(startPosition.x, curPosition.y + standardSpacing, startPosition.width, lineHeightFloat.floatValue);
-                string valHolder = EditorGUI.TextArea(curPosition, expressionString.stringValue, textAreaStyle);
+                string valHolder = expressionString.stringValue;
 
                 //create label directly over textArea to display text with coloring
                 GUI.backgroundColor = new Color(0, 0, 0, 0);
@@ -262,6 +286,7 @@ namespace delib.calculate.unity
 
                 }
 
+                valHolder = EditorGUI.TextArea(curPosition, valHolder, textAreaStyle);
                 EditorGUI.LabelField(curPosition, labelText, textAreaStyle);
 
 

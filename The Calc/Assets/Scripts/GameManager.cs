@@ -32,10 +32,12 @@ public class GameManager : MonoBehaviour
 
     public TMP_Text textPreFab;
 
+    [ArgumentName(0, "stuff")]
     public ExpressionField<TestingClass> field;
     public ExpressionField field2;
 
 
+    [ArgumentName(2, "Dolmm")]
     public ExpressionField<TestingClass, TestingClass, int, GameManager> field3;
     public GameObject VariableMemoryViewContent;
 
