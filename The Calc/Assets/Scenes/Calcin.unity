@@ -1036,12 +1036,12 @@ MonoBehaviour:
   textPreFab: {fileID: 7717357080427439117, guid: 3d4bfcfc215d15c4cb64f6b83875bc6e, type: 3}
   field:
     inspectorToggle: 1
-    validCheck: 0
+    validCheck: 1
     lineHeight: 40
     argInfos:
     - rid: 6605158970466763699
     containingClass: {fileID: 1058662490}
-    expression: arg0.testItMethod(4)
+    expression: exampleMethod(6)
   field2:
     inspectorToggle: 0
     validCheck: 1
@@ -1050,7 +1050,7 @@ MonoBehaviour:
     containingClass: {fileID: 1058662490}
     expression: 
   field3:
-    inspectorToggle: 1
+    inspectorToggle: 0
     validCheck: 1
     lineHeight: 40
     argInfos:
@@ -1071,9 +1071,9 @@ MonoBehaviour:
         fieldsHeight: 60
         fieldName: 
         fields:
-        - rid: 6605159072333300691
-        - rid: 6605159072333300692
-        - rid: 6605159072333300693
+        - rid: 6605159077417845081
+        - rid: 6605159077417845082
+        - rid: 6605159077417845083
     - rid: 6605158979654909952
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
@@ -1102,25 +1102,25 @@ MonoBehaviour:
         fieldsHeight: 620
         fieldName: 
         fields: []
-    - rid: 6605159072333300691
+    - rid: 6605159077417845081
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
         inspectorToggle: 0
         fieldsHeight: 0
         fieldName: Instance
         fields: []
-    - rid: 6605159072333300692
+    - rid: 6605159077417845082
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
         inspectorToggle: 0
         fieldsHeight: 0
         fieldName: testIt
         fields: []
-    - rid: 6605159072333300693
+    - rid: 6605159077417845083
       type: {class: ClassFieldInfoHolder, ns: delib.calculate.unity, asm: Assembly-CSharp}
       data:
         inspectorToggle: 0
-        fieldsHeight: 0
+        fieldsHeight: 40
         fieldName: testItProp
         fields: []
 --- !u!1 &1256280177

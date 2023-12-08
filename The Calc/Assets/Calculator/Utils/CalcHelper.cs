@@ -127,6 +127,7 @@ namespace delib.calculate
             System.Type curType = curObj.GetType();
             System.Attribute[] curatrs = System.Attribute.GetCustomAttributes(curObj.GetType());
             string curPath = null;
+            MemberInfo curMemberInfo = null;
             for (int objIndex = 0; objIndex < objPath.Length; objIndex++)
             {
                 fullObjectPathObjects.Add(new ClassPathInfo(curObj, curPath, curatrs));
@@ -150,9 +151,31 @@ namespace delib.calculate
                     continue;
                 }
                 FieldInfo curFieldInfo = curType.GetField($"{curPath}", Library.AllClassVariablesBindingFlag);
-                if (curFieldInfo == null)
+                PropertyInfo curPropertyInfo = curType.GetProperty($"{curPath}", Library.AllClassVariablesBindingFlag);
+                MethodInfo curMethodInfo = curType.GetMethod($"{curPath}", Library.AllClassVariablesBindingFlag);
+
+
+                if (curMethodInfo != null)//if we reach a method the loop must end
+                {
+                    curObj = curMethodInfo;
+                    curType = curObj.GetType();
+                    curatrs = System.Attribute.GetCustomAttributes(curMethodInfo);
+                    break;
+                }
+                else if (curPropertyInfo != null)
+                {
+                    curObj = curPropertyInfo.GetValue(curObj);
+                    curMemberInfo = curPropertyInfo;
+
+                }
+                else if (curFieldInfo != null)
+                {
+                    curObj = curFieldInfo.GetValue(curObj);
+                    curMemberInfo = curFieldInfo;
+                }
+                else
                     return null;
-                curObj = curFieldInfo.GetValue(curObj);
+
                 if (curObj == null)//in case the final property in our path is a nullable type and is currently null
                 {
                     curType = null;
@@ -161,7 +184,7 @@ namespace delib.calculate
                 else
                 {
                     curType = curObj.GetType();
-                    curatrs = System.Attribute.GetCustomAttributes(curFieldInfo);
+                    curatrs = System.Attribute.GetCustomAttributes(curMemberInfo);
                 }
             }
 
@@ -171,6 +194,38 @@ namespace delib.calculate
 
         //returns the type of the field located at the end of path or 'null' if path does not exist
         //NOTE: works for fields and properties
+        public static System.Type FindTypeFromPathHaltOnMethod(this System.Type type, string path)
+        {
+            string[] argPath = path.Split('.');
+            //object arg = argumentMemory[argPath[0]].ObjectValue;
+
+            System.Type curType = type;
+
+            for (int argIndex = 0; argIndex < argPath.Length; argIndex++)
+            {
+                FieldInfo curFieldInfo = curType.GetField($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
+                PropertyInfo curPropertyInfo = curType.GetProperty($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
+                MethodInfo curMethodInfo = curType.GetMethod($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
+
+
+                if (curMethodInfo != null)
+                {
+                    return typeof(MethodInfo);
+                }
+
+                if (curPropertyInfo != null)
+                {
+                    curType = curPropertyInfo.PropertyType;
+                    continue;
+                }
+
+                if (curFieldInfo == null)
+                    return null;
+                curType = curFieldInfo.FieldType;
+            }
+
+            return curType;
+        }
         public static System.Type FindTypeFromPath(this System.Type type, string path)
         {
             string[] argPath = path.Split('.');
@@ -182,6 +237,14 @@ namespace delib.calculate
             {
                 FieldInfo curFieldInfo = curType.GetField($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
                 PropertyInfo curPropertyInfo = curType.GetProperty($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
+                MethodInfo curMethodInfo = curType.GetMethod($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
+
+
+                if (curMethodInfo != null)
+                {
+                    curType = curMethodInfo.ReturnType;
+                    continue;
+                }
 
                 if (curPropertyInfo != null)
                 {

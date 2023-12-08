@@ -224,8 +224,14 @@ namespace delib.calculate
             //arguments must additionally be check to see if there fieldpath is valid
             if (node.token.Type == TokenTypeValue.Argument)
             {
+                if(node.parent != null)
+                {
+                    if (node.parent.token.Type == TokenTypeValue.ArgumentFunction)
+                        return true;
+                }
                 string[] argPath = node.token.ObjectName.Split('.');
                 string remainingPath = "";
+
                 for (int pathIndex = 1; pathIndex < argPath.Length; pathIndex++)
                 {
                     remainingPath += $".{argPath[pathIndex]}";
@@ -237,6 +243,9 @@ namespace delib.calculate
                 int argNum = int.Parse(argPath[0].Remove(0, 3));
 
                 if (argNum >= node.subTree.argumentTypes.Length) return false;
+
+                if (argPath.Length < 2)
+                    return Library.CaclulatorConstantTypes.Contains(node.subTree.argumentTypes[argNum]);
 
                 return node.subTree.argumentTypes[argNum].FieldPathIsConstantNumber(remainingPath);
             }

@@ -123,10 +123,11 @@ namespace delib.calculate.unity
             //Get access to the current properties Type information
             ClassPathInfo propertyClassInfo = property.serializedObject.targetObject.FindObjectFromPath(property.propertyPath);
             ExpressionFieldBase propertyObj = (ExpressionFieldBase)propertyClassInfo.classObj;//.GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
-            Calculator containingCalc = CalcHelper.ConvertClassToCalculator(property.serializedObject.targetObject.GetType());
             System.Attribute[] propertyAttributes = propertyClassInfo.attributes;
             System.Type propertyType = propertyObj.GetType();//.GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
             System.Type[] propertyTypeGenericTypes = propertyType.GetGenericArguments();
+
+            Calculator containingCalc = CalcHelper.ConvertClassToCalculator(property.serializedObject.targetObject.GetType(), propertyTypeGenericTypes);
 
             //property's internal property variables
             SerializedProperty expressionString = property.FindPropertyRelative("expression");

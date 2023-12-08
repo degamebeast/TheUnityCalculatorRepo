@@ -23,6 +23,11 @@ public class GameManager : MonoBehaviour
             return Mathf.Pow(2, x);
         }
 
+        public void testItWrongMethod(int x)
+        {
+            //return Mathf.Pow(2, x);
+        }
+
         public TestingClass()
         {
             Instance = this;
@@ -52,6 +57,7 @@ public class GameManager : MonoBehaviour
     private float example2;
     private float cobo;
 
+    TestingClass tester = new TestingClass();
 
     private Integer inttest;
     private Integer intexample;

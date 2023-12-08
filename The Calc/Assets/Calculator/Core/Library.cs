@@ -60,6 +60,7 @@ namespace delib.calculate
             {TokenTypeValue.Integer, 7},
             {TokenTypeValue.Constant, 7},
 
+            {TokenTypeValue.ArgumentFunction, 5},
             {TokenTypeValue.Function, 6},
             {TokenTypeValue.Argument, 6},
 
@@ -103,6 +104,7 @@ namespace delib.calculate
                     TokenTypeValue.Function,
                     TokenTypeValue.Parameters,
                     TokenTypeValue.Argument,
+                    TokenTypeValue.ArgumentFunction,
                     TokenTypeValue.Dot,
                     TokenTypeValue.Open_Paren,
                     TokenTypeValue.Close_Paren,
@@ -128,6 +130,7 @@ namespace delib.calculate
                     TokenTypeValue.Integer,
                     TokenTypeValue.Variable,
                     //TokenTypeValue.Function,
+                    TokenTypeValue.ArgumentFunction,
                     TokenTypeValue.Argument,
                     TokenTypeValue.Expression,
                     TokenTypeValue.Parameters
@@ -156,6 +159,7 @@ namespace delib.calculate
                 {
                     TokenTypeValue.Identifier,
                     TokenTypeValue.Variable,
+                    TokenTypeValue.ArgumentFunction,
                     TokenTypeValue.Function,
                     TokenTypeValue.Argument
                 }
@@ -165,6 +169,7 @@ namespace delib.calculate
                 new List<TokenTypeValue>()
                 {
                     TokenTypeValue.Assignment,
+                    TokenTypeValue.ArgumentFunction,
                     TokenTypeValue.Function,
                     TokenTypeValue.Exponent,
                     TokenTypeValue.Multiplication,
@@ -276,6 +281,13 @@ namespace delib.calculate
                 {
                     new Operands(TokenTypeValue.Any, TokenTypeValue.Parameters),
                 }
+            },
+            {
+                TokenTypeValue.ArgumentFunction,
+                new List<Operands>()
+                {
+                    new Operands(TokenTypeValue.Argument, TokenTypeValue.Parameters),
+                }
             }
         };
 
@@ -284,6 +296,7 @@ namespace delib.calculate
         {
             TokenTypeValue.Identifier,
             TokenTypeValue.Variable,
+            TokenTypeValue.ArgumentFunction,
             TokenTypeValue.Argument,
             TokenTypeValue.Function
         };

@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Unity.Burst.Intrinsics;
 
 namespace delib.calculate
 {
@@ -162,7 +163,48 @@ namespace delib.calculate
                 {
                     ResolveIdentifiers(cur.Expression, addVariableIfNotInMemory);
                 }
-                else if (cur.Type == TokenTypeValue.Identifier)
+                else if (cur.Type == TokenTypeValue.Argument)
+                {
+                    Argument arg;
+                    string[] argSplit = cur.ObjectName.Split('.');
+                    if (argumentMemory.TryGetValue(argSplit[0], out arg))
+                    {
+                        if (arg == null) continue;
+                        string path = "";
+                        System.Type argFinalType = null;
+                        if(argSplit.Length > 1)
+                        {
+                            path = argSplit[1];
+                            for(int pathInd = 2; pathInd < argSplit.Length; pathInd++)
+                            {
+                                path += $".{argSplit[pathInd]}";
+                            }
+                            argFinalType = arg.ArgType.FindTypeFromPathHaltOnMethod(path);
+                        }
+                        if(argFinalType == typeof(MethodInfo))
+                        {
+                            string argName = argSplit[0];
+                            for (int argInd = 1; argInd < argSplit.Length - 1; argInd++)
+                            {
+                                argName += $".{argSplit[argInd]}";
+                            }
+                            expr[i] = new Token(argName, TokenTypeValue.Argument);
+                            if (expr[i + 1].Type == TokenTypeValue.Expression)
+                                expr[i + 1] = new Token(expr[i + 1].Expression, TokenTypeValue.Parameters);
+
+                            expr.Insert(i + 1, new Token(argSplit[argSplit.Length - 1], TokenTypeValue.ArgumentFunction));
+
+                        }
+                        else
+                        {
+                            expr[i] = new Token(cur.ObjectName, TokenTypeValue.Argument);
+                        }
+
+                            continue;
+
+                    }
+                }
+                        else if (cur.Type == TokenTypeValue.Identifier)
                 {
                     Function funct;
                     Variable var;
@@ -177,6 +219,7 @@ namespace delib.calculate
                     if (argumentMemory.TryGetValue(argSplit[0], out arg))
                     {
                         expr[i] = new Token(cur.ObjectName, TokenTypeValue.Argument);
+                        i--;
                         continue;
                     }
 
@@ -300,6 +343,8 @@ namespace delib.calculate
                 case float:
                     resolvedField = new Constant((float)curField);
                     break;
+                default:
+                    return new Token(resArg, TokenTypeValue.Argument);
             }
 
             return new Token(resolvedField);
@@ -317,11 +362,17 @@ namespace delib.calculate
                 case TokenTypeValue.Argument://---
 
                     expr[index] = ResolveArgument(expr[index].ObjectName);
-                    return index-1;
+                    return index;
                 case TokenTypeValue.Variable://if a variable, resolve down to it's stored Constant
                     if (expr[index + 1].Type == TokenTypeValue.Assignment)
                         return index + 1;
                     expr[index] = new Token(variableMemory[expr[index].ObjectName].Value);
+                    return index;
+                case TokenTypeValue.ArgumentFunction:
+                    expr[index] = ResolveArgument($"{expr[index-1].ObjectName}.{ expr[index].ObjectName}");
+                    expr[index-1] = new Token(FunctionCall(this, expr[index], expr[index + 1]));
+                    expr.RemoveAt(index + 1);
+                    expr.RemoveAt(index);
                     return index;
                 case TokenTypeValue.Function:
                     expr[index] = new Token(FunctionCall(this, expr[index], expr[index + 1]));
