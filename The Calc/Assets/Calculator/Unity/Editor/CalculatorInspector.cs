@@ -136,6 +136,9 @@ namespace delib.calculate.unity
             SerializedProperty argInfosRefArray = property.FindPropertyRelative("argInfos");
             #endregion
 
+            Dictionary<string, string> argToName = new Dictionary<string, string>();
+            Dictionary<string, string> nameToArg = new Dictionary<string, string>();
+
             //assigning the current property position tracker to it's default value
             Rect curPosition = startPosition;
 
@@ -212,6 +215,12 @@ namespace delib.calculate.unity
                     argNames[argAtr.ArgNum] = argAtr.ArgName;
                 }
 
+                for (int i = 0; i < propertyTypeGenericTypes.Length; i++)
+                {
+                    argToName.Add($"arg{i}", argNames[i]);
+                    nameToArg.Add(argNames[i], $"arg{i}");
+                }
+
                 //draw all generic TYpe info
                 for (int i = 0; i < propertyTypeGenericTypes.Length; i++)
                 {
@@ -250,6 +259,7 @@ namespace delib.calculate.unity
                 labelExpress.RemoveAllNulls();
 
                 string labelText = "";
+                string inputText = "";
                 int textIndex = 0;
                 foreach (Token toke in labelExpress)
                 {
@@ -273,25 +283,80 @@ namespace delib.calculate.unity
                     if (toke.Type == TokenTypeValue.Invalid)
                     {
                         labelText += $"<color=\"#{ColorUtility.ToHtmlStringRGBA(col)}\">_</color>";
+                        inputText += $"{valHolder[textIndex]}";
                         textIndex++;
                     }
                     else if (toke.Type == TokenTypeValue.Ignore)
                     {
                         labelText += " ";
+                        inputText += " ";
                         textIndex++;
                     }
+                    else if (toke.Type == TokenTypeValue.Argument)
+                    {
+                        string[] argSplit = tokeText.Split('.');
+                        string argFinal = argSplit[0];
+
+                        if (argToName.ContainsKey(argSplit[0]))
+                            argFinal = argToName[argSplit[0]];
+
+
+                        labelText += $"<color=\"#{ColorUtility.ToHtmlStringRGBA(col)}\">{argFinal}</color>";
+                        inputText += $"{argFinal}";
+                    }
                     else
+                    {
                         labelText += $"<color=\"#{ColorUtility.ToHtmlStringRGBA(col)}\">{tokeText}</color>";
+                        inputText += $"{tokeText}";
+                    }
 
 
                 }
 
-                valHolder = EditorGUI.TextArea(curPosition, valHolder, textAreaStyle);
+                valHolder = EditorGUI.TextArea(curPosition, inputText, textAreaStyle);
                 EditorGUI.LabelField(curPosition, labelText, textAreaStyle);
 
+                labelExpress = new Expression(valHolder, false);//reusing variable
+                //propCalc.ResolveIdentifiers(labelExpress);
+                //labelExpress.AddNullCaps();
+                //Expression.CondenseDots(labelExpress);
+                labelExpress.RemoveAllNulls();
+
+                inputText = "";//reusing input text variable
+                textIndex = 0;
+                for( int i = 0; i < labelExpress.Count; i++)
+                {
+                    Token toke = labelExpress[i];
+                    if (toke.Type == TokenTypeValue.Invalid)
+                    {
+
+                        inputText += $"{valHolder[textIndex]}";
+                        textIndex++;
+                    }
+                    else if (toke.Type == TokenTypeValue.Ignore)
+                    {
+                        inputText += " ";
+                        textIndex++;
+                    }
+                    else if (toke.Type == TokenTypeValue.Identifier)
+                    {
+                        if (nameToArg.ContainsKey(toke.ObjectName))
+                        {
+                            textIndex += toke.ObjectName.Length;
+                            labelExpress[i] = new Token(nameToArg[toke.ObjectName]);
+                        }
+                        inputText += labelExpress[i].ToString();
+                    }
+                    else
+                    {
+                        string text = labelExpress[i].ToString();
+                        inputText += text;
+                        textIndex += text.Length;
+                    }
+                }
 
                 //assign current value stored in textArea back out to the expression field in property
-                expressionString.stringValue = valHolder;
+                expressionString.stringValue = inputText;
             }
             GUILayout.EndVertical();
 

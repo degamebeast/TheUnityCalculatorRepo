@@ -1,6 +1,5 @@
 //Created by: Deontae Albertie
 
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -438,14 +437,14 @@ namespace delib.calculate
                 "abs",
                 new Function("abs", 1, (calc, args) =>
                 {
-                    return MathF.Abs(args[0].Value);
+                    return System.MathF.Abs(args[0].Value);
                 })
             },
             {
                 "max",
                 new Function("max", 2, (calc, args) =>
                 {
-                    return MathF.Max(args[0].Value, args[1].Value);
+                    return System.MathF.Max(args[0].Value, args[1].Value);
                 })
             }
         };
