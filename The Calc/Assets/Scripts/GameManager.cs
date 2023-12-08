@@ -18,6 +18,11 @@ public class GameManager : MonoBehaviour
             set;
         }
 
+        public float testItMethod(int x)
+        {
+            return Mathf.Pow(2, x);
+        }
+
         public TestingClass()
         {
             Instance = this;

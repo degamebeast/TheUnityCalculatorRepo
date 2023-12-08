@@ -29,7 +29,7 @@ namespace delib.calculate
 
         public Constant Calculate(string expr, params object[] args)
         {
-            return Calculate(new Expression(expr),args);
+            return Calculate(new Expression(expr), args);
         }
 
         //solves the given expression and then stores the answer inside of the "ans" calculator variable
@@ -40,7 +40,7 @@ namespace delib.calculate
 
             foreach (Expression statementExpr in statements)
             {
-                variableMemory["ans"].Set(ExpressResult(ResolveIdentifiers(statementExpr,true)));
+                variableMemory["ans"].Set(ExpressResult(ResolveIdentifiers(statementExpr, true)));
             }
 
             return variableMemory["ans"].Value;
@@ -55,8 +55,8 @@ namespace delib.calculate
 
             for (int i = 0; i < argLimit; i++)
             {
-                    string argName = $"arg{i}";
-                if(i < args.Length)
+                string argName = $"arg{i}";
+                if (i < args.Length)
                 {
                     argumentMemory.Add(argName, new Argument(argName, args[i]));
                 }
@@ -72,7 +72,7 @@ namespace delib.calculate
         {
 
             //starting from ConstantPriority - 1 so that constant values aren't used as operators
-            for (int priority = Library.ConstantPriority-1; priority > 0; priority--)
+            for (int priority = Library.ConstantPriority - 1; priority > 0; priority--)
             {
                 for (int index = 0; index < expr.Count; index++)
                 {
@@ -115,7 +115,7 @@ namespace delib.calculate
 
         public bool AddFunctionToMemory(string funcName, int argCount, CalculatorFunction funct)
         {
-            return AddFunctionToMemory(new Function(funcName, argCount, funct ));
+            return AddFunctionToMemory(new Function(funcName, argCount, funct));
         }
 
         //returns true if the given variable was successfully added to memory and false otherwise
@@ -155,7 +155,7 @@ namespace delib.calculate
         //if an identifier is not recognized it gets added to the variable memory (the added variable will be unitialized)
         public Expression ResolveIdentifiers(Expression expr, bool addVariableIfNotInMemory = false)
         {
-            for(int i = 0; i < expr.Count; i++)
+            for (int i = 0; i < expr.Count; i++)
             {
                 Token cur = expr[i];
                 if (cur.Type == TokenTypeValue.Expression)
@@ -185,7 +185,7 @@ namespace delib.calculate
                     {
                         expr[i] = new Token(cur.ObjectName, TokenTypeValue.Variable);
                     }
-                    else if(addVariableIfNotInMemory)
+                    else if (addVariableIfNotInMemory)
                     {
                         variableMemory.Add(cur.ObjectName, new Variable(cur.ObjectName));
                         expr[i] = new Token(cur.ObjectName, TokenTypeValue.Variable);
@@ -198,7 +198,7 @@ namespace delib.calculate
             return expr;
         }
 
-        public Constant ResolveArgument(string resArg)
+        public Token ResolveArgument(string resArg)
         {
             string[] argPath = resArg.Split('.');
             object arg = argumentMemory[argPath[0]].ObjectValue;
@@ -210,7 +210,69 @@ namespace delib.calculate
                 System.Type curType = curField.GetType();
                 FieldInfo curFieldInfo = curType.GetField($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
                 PropertyInfo curPropertyInfo = curType.GetProperty($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
+                MethodInfo curMethodInfo = curType.GetMethod($"{argPath[argIndex]}", Library.AllClassVariablesBindingFlag);
 
+
+                if (curMethodInfo != null)
+                {
+                    ParameterInfo[] paramInfos = curMethodInfo.GetParameters();
+                    AddFunctionToMemory(curMethodInfo.Name, paramInfos.Length, (calc, args) =>
+                        {
+                            object[] argValues = new object[args.Length];
+                            for (int argInd = 0; argInd < args.Length; argInd++)
+                            {
+                                Constant argVal = args[argInd].Value;
+
+
+                                if (paramInfos[argInd].ParameterType == typeof(Integer))
+                                {
+                                    argValues[argInd] = argVal.ToInteger();
+                                    continue;
+                                }
+                                else if (paramInfos[argInd].ParameterType == typeof(int))
+                                {
+                                    argValues[argInd] = (int)argVal.ToInteger();
+                                    continue;
+                                }
+                                else if (paramInfos[argInd].ParameterType == typeof(Constant))
+                                {
+                                    argValues[argInd] = argVal;
+                                    continue;
+                                }
+                                else if (paramInfos[argInd].ParameterType == typeof(float))
+                                {
+                                    argValues[argInd] = (float)argVal;
+                                    continue;
+                                }
+
+                                argValues[argInd] = null;
+                            }
+
+                            object ret = curMethodInfo.Invoke(curField, argValues);
+
+                            if (ret is Constant)
+                            {
+                                return ret as Constant;
+                            }
+                            else if (ret is float)
+                            {
+                                return (float)ret;
+                            }
+                            else if (ret is Integer)
+                            {
+                                return ret as Integer;
+                            }
+                            else if (ret is int)
+                            {
+                                return (int)ret;
+                            }
+
+                            return null;
+                        });
+
+
+                    return new Token(curMethodInfo.Name, TokenTypeValue.Function);
+                }
 
                 if (curPropertyInfo != null)
                 {
@@ -240,7 +302,7 @@ namespace delib.calculate
                     break;
             }
 
-            return resolvedField;
+            return new Token(resolvedField);
         }
 
 
@@ -253,8 +315,9 @@ namespace delib.calculate
                 case TokenTypeValue.Null://if null then just continue looping
                     return index + 1;
                 case TokenTypeValue.Argument://---
-                    expr[index] = new Token(ResolveArgument(expr[index].ObjectName));
-                    return index;
+
+                    expr[index] = ResolveArgument(expr[index].ObjectName);
+                    return index-1;
                 case TokenTypeValue.Variable://if a variable, resolve down to it's stored Constant
                     if (expr[index + 1].Type == TokenTypeValue.Assignment)
                         return index + 1;
@@ -289,7 +352,7 @@ namespace delib.calculate
         public static Constant AssignmentOperator(Calculator calc, params Token[] args)
         {
             bool intCheck = args[1].Value is Integer;
-            Variable newVar = intCheck? new Variable(args[0].ObjectName, args[1].Value as Integer) : new Variable(args[0].ObjectName, args[1].Value);
+            Variable newVar = intCheck ? new Variable(args[0].ObjectName, args[1].Value as Integer) : new Variable(args[0].ObjectName, args[1].Value);
             if (!calc.variableMemory.TryAdd(newVar.VarName, newVar))
             {
                 calc.variableMemory[newVar.VarName] = newVar;
@@ -305,7 +368,7 @@ namespace delib.calculate
             if (calc.functionMemory.TryGetValue(args[0].ObjectName, out curFunct))
             {
                 if (args[1].Expression == null) return float.NaN;
-                
+
 
                 Expression parameters = args[1].Expression.GetResolveParameters();
 
@@ -324,7 +387,7 @@ namespace delib.calculate
     }
 
 
-    
+
 
 
     //represents a constant mathematical value
@@ -344,6 +407,11 @@ namespace delib.calculate
         public override string ToString()
         {
             return value.ToString();
+        }
+
+        public virtual Integer ToInteger()
+        {
+            return value;
         }
 
         public static implicit operator float(Constant constant)
@@ -377,6 +445,11 @@ namespace delib.calculate
         public override string ToString()
         {
             return intValue.ToString();
+        }
+
+        public override Integer ToInteger()
+        {
+            return this;
         }
 
         public static implicit operator float(Integer integer)

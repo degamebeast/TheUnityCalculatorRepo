@@ -52,7 +52,6 @@ namespace delib.calculate
             {TokenTypeValue.End_Statement, 0},
             {TokenTypeValue.Open_Paren, 0},
             {TokenTypeValue.Close_Paren, 0},
-            {TokenTypeValue.Argument, 0},
 
 
             {TokenTypeValue.Parameters, 7},
@@ -62,6 +61,7 @@ namespace delib.calculate
             {TokenTypeValue.Constant, 7},
 
             {TokenTypeValue.Function, 6},
+            {TokenTypeValue.Argument, 6},
 
             {TokenTypeValue.Expression, 5},
             {TokenTypeValue.Variable, 5},
