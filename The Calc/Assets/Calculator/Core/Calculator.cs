@@ -103,6 +103,22 @@ namespace delib.calculate
         }
 
         //returns true if the given variable was successfully added to memory and false otherwise
+        public bool AddFunctionToMemory(Function funct)
+        {
+            return functionMemory.TryAdd(funct.FuncName, funct);
+        }
+
+        public bool AddFunctionToMemory(string funcName)//creates empty entry
+        {
+            return AddFunctionToMemory(new Function(funcName, 0, null));
+        }
+
+        public bool AddFunctionToMemory(string funcName, int argCount, CalculatorFunction funct)
+        {
+            return AddFunctionToMemory(new Function(funcName, argCount, funct ));
+        }
+
+        //returns true if the given variable was successfully added to memory and false otherwise
         public bool AddVariableToMemory(Variable var)
         {
             return variableMemory.TryAdd(var.VarName, var);

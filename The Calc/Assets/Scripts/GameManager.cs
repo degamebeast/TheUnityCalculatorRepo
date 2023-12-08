@@ -43,8 +43,10 @@ public class GameManager : MonoBehaviour
 
     private Constant test;
     private Constant example;
+    private Constant exampleProp { get; set; }
     private float example2;
     private float cobo;
+
 
     private Integer inttest;
     private Integer intexample;
@@ -81,6 +83,11 @@ public class GameManager : MonoBehaviour
         Debug.Log(field2.Evaluate());
         //CalculateExpress(field.ContainingClassContextFieldExpression);
         //CalculateExpress(classs.field2.ContainingClassContextFieldExpression);
+    }
+
+    public Constant exampleMethod(Constant test)
+    {
+        return test * 2;
     }
 
 

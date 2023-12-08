@@ -23,6 +23,20 @@ namespace delib.calculate
 
             }
 
+            foreach (PropertyInfo pi in type.GetProperties(Library.AllClassVariablesBindingFlag))
+            {
+
+                classContextCalc.AddVariableToMemory(pi.Name, null);
+
+            }
+
+            foreach (MethodInfo mi in type.GetMethods(Library.AllClassVariablesBindingFlag))
+            {
+
+                classContextCalc.AddFunctionToMemory(mi.Name);
+
+            }
+
             return classContextCalc;
         }
 
@@ -231,6 +245,78 @@ namespace delib.calculate
                 }
 
             }
+
+            foreach (PropertyInfo pi in obj.GetType().GetProperties(Library.AllClassVariablesBindingFlag))
+            {
+
+                if (pi.PropertyType == typeof(Constant))
+                {
+                    Constant val = pi.GetValue(obj) as Constant;
+                    classContextCalc.AddVariableToMemory(pi.Name, val);
+                }
+                else if (pi.PropertyType == typeof(float))
+                {
+                    float val = (float)pi.GetValue(obj);
+                    classContextCalc.AddVariableToMemory(pi.Name, val);
+                }
+                else if (pi.PropertyType == typeof(Integer))
+                {
+                    Integer val = pi.GetValue(obj) as Integer;
+                    classContextCalc.AddVariableToMemory(pi.Name, val);
+                }
+                else if (pi.PropertyType == typeof(int))
+                {
+                    int val = (int)pi.GetValue(obj);
+                    classContextCalc.AddVariableToMemory(pi.Name, val);
+                }
+
+            }
+
+            foreach (MethodInfo mi in obj.GetType().GetMethods(Library.AllClassVariablesBindingFlag))
+            {
+                if (!Library.CaclulatorConstantTypes.Contains(mi.ReturnParameter.ParameterType)) continue;
+
+                ParameterInfo[] miPis = mi.GetParameters();
+
+                for(int i = 0; i < miPis.Length; i++)
+                {
+                    if (!Library.CaclulatorConstantTypes.Contains(miPis[i].ParameterType)) continue;
+                }
+
+
+                classContextCalc.AddFunctionToMemory(mi.Name, miPis.Length, (calc, args) =>
+                {
+                    Constant[] argValues = new Constant[args.Length];
+                    for(int argInd = 0; argInd < args.Length; argInd++)
+                    {
+                        argValues[argInd] = args[argInd].Value;
+                    }
+
+                    object ret = mi.Invoke(obj, argValues);
+
+                    if (ret is Constant)
+                    {
+                        return ret as Constant;
+                    }
+                    else if (ret is float)
+                    {
+                        return (float)ret;
+                    }
+                    else if (ret is Integer)
+                    {
+                        return ret as Integer;
+                    }
+                    else if (ret is int)
+                    {
+                        return (int)ret;
+                    }
+
+                    return null;
+                });
+
+            }
+
+
 
             return classContextCalc;
         }

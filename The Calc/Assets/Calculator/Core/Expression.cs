@@ -13,6 +13,8 @@ namespace delib.calculate
         {
             if (clean)
                 CleanExpression();
+
+            MarkParameters(this);
         }
 
         //clean - whether or not the tokens should be cleaned up and compacted upon construction
@@ -20,6 +22,8 @@ namespace delib.calculate
         {
             if (clean)
                 CleanExpression();
+
+            MarkParameters(this);
         }
 
         //clean - whether or not the tokens should be cleaned up and compacted upon construction
@@ -27,6 +31,8 @@ namespace delib.calculate
         {
             if (clean)
                 CleanExpression();
+
+            MarkParameters(this);
         }
 
         //calc - a calculator that all identifiers will be resolved to upon construction. This value IS NOT stored inside the expression afterwards
@@ -37,6 +43,8 @@ namespace delib.calculate
 
             if (clean)
                 CleanExpression();
+
+            MarkParameters(this);
         }
         //calc - a calculator that all identifiers will be resolved to upon construction. This value IS NOT stored inside the expression afterwards
         //clean - whether or not the tokens should be cleaned up and compacted upon construction
@@ -46,6 +54,8 @@ namespace delib.calculate
 
             if (clean)
                 CleanExpression();
+
+            MarkParameters(this);
         }
 
 
@@ -216,11 +226,31 @@ namespace delib.calculate
             return expr;
         }
 
+
+        public static Expression MarkParameters(Expression expr)
+        {
+            for (int i = 1; i < expr.Count; i++)
+            {
+                if (expr[i - 1].Type == TokenTypeValue.Function)
+                {
+                    if (expr[i].Type == TokenTypeValue.Expression)
+                    {
+                        expr[i] = new Token(expr[i].Expression, TokenTypeValue.Parameters);
+                    }
+                }
+            }
+
+
+            return expr;
+        }
+
         //does not change/alter invoking object
         public Expression GetResolveParameters()
         {
             return ResolveParameters(this);
         }
+
+
 
         //returns a new Expression with the given arguments resolved down to there respective types
         //the passed in expr is not altered

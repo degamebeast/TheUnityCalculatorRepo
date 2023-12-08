@@ -123,6 +123,7 @@ namespace delib.calculate.unity
             //Get access to the current properties Type information
             ClassPathInfo propertyClassInfo = property.serializedObject.targetObject.FindObjectFromPath(property.propertyPath);
             ExpressionFieldBase propertyObj = (ExpressionFieldBase)propertyClassInfo.classObj;//.GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
+            Calculator containingCalc = CalcHelper.ConvertClassToCalculator(property.serializedObject.targetObject.GetType());
             System.Attribute[] propertyAttributes = propertyClassInfo.attributes;
             System.Type propertyType = propertyObj.GetType();//.GetField(property.name, Library.AllClassVariablesBindingFlag).FieldType;
             System.Type[] propertyTypeGenericTypes = propertyType.GetGenericArguments();
@@ -195,7 +196,8 @@ namespace delib.calculate.unity
             if (toggleBool.boolValue)
             {
                 EditorGUI.indentLevel = 1;
-                Calculator propCalc = CalcHelper.ConvertClassToCalculator(propertyType);
+                //Calculator propCalc = CalcHelper.ConvertClassToCalculator(propertyType);
+
                 ArgumentNameAttribute[] argAttributes = new ArgumentNameAttribute[propertyTypeGenericTypes.Length];
                 string[] argNames = new string[propertyTypeGenericTypes.Length];
 
@@ -253,7 +255,7 @@ namespace delib.calculate.unity
                 //create label directly over textArea to display text with coloring
                 GUI.backgroundColor = new Color(0, 0, 0, 0);
                 Expression labelExpress = new Expression(valHolder, false);
-                propCalc.ResolveIdentifiers(labelExpress);
+                containingCalc.ResolveIdentifiers(labelExpress);
                 labelExpress.AddNullCaps();
                 Expression.CondenseDots(labelExpress);
                 labelExpress.RemoveAllNulls();
