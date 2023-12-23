@@ -97,6 +97,7 @@ namespace delib.calculate
                     TokenTypeValue.Ignore,
                     TokenTypeValue.Any,
                     TokenTypeValue.Identifier,
+                    TokenTypeValue.Keyword,
                     TokenTypeValue.Constant,
                     TokenTypeValue.Integer,
                     TokenTypeValue.Variable,
@@ -298,7 +299,8 @@ namespace delib.calculate
             TokenTypeValue.Variable,
             TokenTypeValue.ArgumentFunction,
             TokenTypeValue.Argument,
-            TokenTypeValue.Function
+            TokenTypeValue.Function,
+            TokenTypeValue.Keyword
         };
 
         //token type's that represent some form of expression
@@ -460,6 +462,12 @@ namespace delib.calculate
                     return System.MathF.Max(args[0].Value, args[1].Value);
                 })
             }
+        };
+
+        public static List<string> Keywords = new List<string>()
+        {
+            "local",
+            "static",
         };
     }
 }

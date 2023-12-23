@@ -386,6 +386,7 @@ namespace delib.calculate
     }
 
     //a 2 way dictionary that allows for the 'key' and 'value' to be mutually paired
+    //NOTE: 'key' and 'value' cannot be same type
     public class BiDictionary<TKey, TValue> : IEnumerable
     {
         private Dictionary<TKey, TValue> dict;
